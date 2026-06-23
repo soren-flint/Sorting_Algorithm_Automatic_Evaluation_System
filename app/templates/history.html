@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}提交历史 — 排序算法学习系统{% endblock %}
+{% block content %}
+
+<h5>提交历史</h5>
+
+{% if submissions %}
+<div class="table-responsive">
+<table class="table table-sm table-hover">
+  <thead class="table-light">
+    <tr><th>#</th><th>题目</th><th>状态</th><th>得分</th><th>算法</th><th>时间</th><th></th></tr>
+  </thead>
+  <tbody>
+    {% for s in submissions %}
+    <tr>
+      <td class="small">{{ s.id }}</td>
+      <td>{{ s.problem.title[:24] }}</td>
+      <td>
+        {% set st = s.status %}
+        <span class="badge bg-{{ 'success' if st=='pass' else 'danger' if st=='fail' else 'warning' }}">
+          {{ {'pass':'通过','fail':'失败','error':'错误','timeout':'超时'}.get(st, st) }}
+        </span>
+      </td>
+      <td>{{ s.score }}</td>
+      <td class="small"><code>{{ s.recognized_algo or '-' }}</code></td>
+      <td class="small text-nowrap">{{ s.submitted_at.strftime('%m-%d %H:%M') if s.submitted_at else '' }}</td>
+      <td><a href="{{ url_for('submit.submission_result', submission_id=s.id) }}" class="btn btn-sm btn-outline-secondary">详情</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<p class="text-muted">暂无提交记录。<a href="{{ url_for('problem.list_problems') }}">去做题</a></p>
+{% endif %}
+
+{% endblock %}

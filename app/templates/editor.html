@@ -1,0 +1,412 @@
+{% extends "base.html" %}
+{% block title %}{{ problem.title }} — 排序算法学习系统{% endblock %}
+{% block content %}
+
+<div class="editor-layout">
+
+  <!-- 左侧：题目描述 -->
+  <aside class="problem-sidebar">
+    <div class="sidebar-header">
+      <h2>{{ problem.title }}</h2>
+      <a href="{{ url_for('problem.list_problems') }}" class="btn-back">← 返回</a>
+    </div>
+    <div class="tags">
+      <span class="tag tag-diff">{{ problem.difficulty }}</span>
+      <span class="tag tag-algo">{{ problem.algo_type }}</span>
+      <span class="tag tag-rule">{{ problem.sort_rule }}</span>
+      {% if problem.complexity_ceiling %}
+      <span class="tag tag-cx">≤ {{ problem.complexity_ceiling }}</span>
+      {% endif %}
+      {% if problem.is_meme %}
+      <span class="tag tag-meme">🤪 整活题</span>
+      {% endif %}
+    </div>
+    <div class="desc">{{ problem.description | e }}</div>
+
+    <!-- 示例代码 -->
+    {% if problem.example_code %}
+    <details class="example-code" style="margin-top:14px">
+      <summary>📖 参考示例代码</summary>
+      <pre><code>{{ problem.example_code }}</code></pre>
+    </details>
+    {% endif %}
+
+    {% set cases = problem.test_cases.filter_by(is_public=True).all() %}
+    {% if cases %}
+    <div class="cases">
+      <h3>公开用例</h3>
+      {% for tc in cases %}
+      <div class="case-row">
+        <code>{{ tc.input_data }}</code>
+        {% if tc.expected_output %}<span class="arr">→</span><code>{{ tc.expected_output }}</code>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </aside>
+
+  <!-- 右侧：编辑器 + 结果 -->
+  <main class="editor-main">
+    <div class="editor-panel">
+      <div class="panel-head">
+        <span class="label">代码编辑器</span>
+        <span class="hint">定义 sort(arr) 函数，返回排序后的列表</span>
+      </div>
+      <textarea id="code-editor">def sort(arr):
+    # 在此编写排序算法
+    return arr</textarea>
+      <div class="submit-row">
+        <button id="submit-btn" class="primary" onclick="submitCode()">提交评测</button>
+        <span id="submit-status"></span>
+        <input type="hidden" id="csrf-token" value="{{ csrf_token() }}">
+      </div>
+    </div>
+
+    <!-- 结果区 -->
+    <div id="result-area" class="result-panel" style="display:none">
+      <div id="result-summary" class="result-head"></div>
+      <div id="result-details" class="result-body"></div>
+      <!-- 内联 DOM 柱状图动画 -->
+      <div id="inline-viz" style="display:none;margin-top:14px;padding:12px;background:var(--surface-alt);border-radius:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <span style="font-weight:700;font-size:.85rem">📊 排序过程回放</span>
+          <div>
+            <button id="inline-play" class="btn-sm" onclick="toggleInlinePlay()">▶ 播放</button>
+            <a id="inline-full-link" href="#" class="btn-sm" style="margin-left:6px">全屏查看 →</a>
+          </div>
+        </div>
+        <div class="viz-bar-chart-outer" style="height:180px">
+          <div class="viz-y-axis" id="inline-y-axis"></div>
+          <div class="viz-bar-container" id="inline-bar-container"></div>
+        </div>
+        <div class="viz-legend-row" style="padding-top:6px">
+          <span><span class="viz-legend-swatch" style="background:var(--accent)"></span> 未排序</span>
+          <span><span class="viz-legend-swatch" style="background:var(--warning)"></span> 比较</span>
+          <span><span class="viz-legend-swatch" style="background:var(--danger)"></span> 交换</span>
+          <span><span class="viz-legend-swatch" style="background:var(--success)"></span> 已就位</span>
+        </div>
+        <span id="inline-step-info" style="font-family:var(--font-mono);font-size:.72rem;color:var(--muted)"></span>
+        <span id="inline-empty-hint" style="display:none;color:var(--muted);font-size:.78rem;padding:16px 0;text-align:center;width:100%">📭 该用例暂无排序过程数据（可能原因：步骤采集受限或递归算法不支持逐步骤追踪）</span>
+      </div>
+    </div>
+  </main>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
+  mode: 'python', theme: 'dracula', lineNumbers: true,
+  indentUnit: 4, tabSize: 4, matchBrackets: true, autoCloseBrackets: true,
+  viewportMargin: Infinity
+});
+editor.setSize(null, 520);
+
+// ── 内联 DOM 柱状图动画（与全屏版一致）──
+let inlineSteps=[], inlineCur=0, inlineTimer=null;
+const inlineBarContainer = document.getElementById('inline-bar-container');
+const inlineYAxis = document.getElementById('inline-y-axis');
+const inlinePlayBtn = document.getElementById('inline-play');
+const inlineStepInfo = document.getElementById('inline-step-info');
+
+function inlineGetHeight(v, maxVal) {
+  return Math.max((v / maxVal) * 100, 2) + '%';
+}
+
+function inlineBuildYAxis(maxVal) {
+  inlineYAxis.innerHTML = '';
+  const step = Math.max(10, Math.ceil(maxVal / 10));
+  for (let v = 0; v <= maxVal; v += step) {
+    const tick = document.createElement('div');
+    tick.className = 'viz-y-tick';
+    tick.textContent = v;
+    inlineYAxis.appendChild(tick);
+  }
+}
+
+function inlineBuildChart(arr, maxVal) {
+  inlineBarContainer.innerHTML = '';
+  arr.forEach((val, i) => {
+    const w = document.createElement('div');
+    w.className = 'viz-bar-wrapper';
+    w.style.maxWidth = '55px';
+    w.style.minWidth = '28px';
+    w.dataset.index = i;
+    w.innerHTML =
+      '<div class="viz-bar-val" style="font-size:.75rem">' + val + '</div>' +
+      '<div class="viz-bar-pillar default" style="height:' + inlineGetHeight(val, maxVal) + '"></div>' +
+      '<div class="viz-bar-idx">[' + i + ']</div>';
+    inlineBarContainer.appendChild(w);
+  });
+}
+
+function inlineApplyStep(idx) {
+  if (idx < 0 || idx >= inlineSteps.length) return;
+  inlineCur = idx;
+  const s = inlineSteps[idx];
+  const maxVal = Math.max(...s.array_state, 1);
+  const wrappers = inlineBarContainer.querySelectorAll('.viz-bar-wrapper');
+
+  // 数量不匹配则重建
+  if (wrappers.length !== s.array_state.length) {
+    inlineBuildYAxis(maxVal);
+    inlineBuildChart(s.array_state, maxVal);
+    return inlineApplyStepAfterRebuild(idx);
+  }
+
+  const compSet = new Set(s.op === 'compare' ? [s.i, s.j].filter(x => x != null) : []);
+  const swapSet = new Set(s.op === 'swap' ? [s.i, s.j].filter(x => x != null) : []);
+  const isDone = s.op === 'done';
+
+  wrappers.forEach((w, i) => {
+    const val = s.array_state[i];
+    const vl = w.querySelector('.viz-bar-val');
+    const p = w.querySelector('.viz-bar-pillar');
+    const il = w.querySelector('.viz-bar-idx');
+    vl.textContent = val;
+    p.style.height = inlineGetHeight(val, maxVal);
+    p.className = 'viz-bar-pillar';
+    il.className = 'viz-bar-idx';
+    if (isDone) { p.classList.add('sorted'); il.classList.add('sorted'); }
+    else if (swapSet.has(i)) { p.classList.add('swapping'); il.classList.add('comparing'); }
+    else if (compSet.has(i)) { p.classList.add('comparing'); il.classList.add('comparing'); }
+    else p.classList.add('default');
+  });
+
+  inlineStepInfo.textContent = '步骤 ' + (inlineCur + 1) + '/' + inlineSteps.length;
+}
+
+function inlineApplyStepAfterRebuild(idx) {
+  if (idx < 0 || idx >= inlineSteps.length) return;
+  inlineCur = idx;
+  const s = inlineSteps[idx];
+  inlineStepInfo.textContent = '步骤 ' + (inlineCur + 1) + '/' + inlineSteps.length;
+}
+
+function loadInlineViz(submissionId, detailId) {
+ fetch('/submit/api/steps/' + detailId).then(r => r.json()).then(steps => {
+   // 始终显示动画区域
+   const viz = document.getElementById('inline-viz');
+   viz.style.display = 'block';
+   document.getElementById('inline-full-link').href = '/submit/visualize/' + submissionId;
+   // 空数据 → 显示空状态提示
+   if (!steps || !steps.length) {
+     document.getElementById('inline-play').style.display = 'none';
+     document.getElementById('inline-empty-hint').style.display = 'block';
+     inlineBarContainer.innerHTML = '';
+     inlineYAxis.innerHTML = '';
+     inlineStepInfo.textContent = '暂无排序过程数据';
+     return;
+   }
+   // 有数据 → 正常渲染
+   document.getElementById('inline-play').style.display = '';
+   document.getElementById('inline-empty-hint').style.display = 'none';
+   inlineSteps = steps; inlineCur = -1;
+   const s0 = steps[0];
+   const maxVal = Math.max(...s0.array_state, 1);
+   inlineBuildYAxis(maxVal);
+   inlineBuildChart(s0.array_state, maxVal);
+   inlineStepInfo.textContent = '步骤 0/' + steps.length;
+ }).catch(() => {
+   // 网络错误也显示空状态
+   const viz = document.getElementById('inline-viz');
+   viz.style.display = 'block';
+   document.getElementById('inline-play').style.display = 'none';
+   document.getElementById('inline-empty-hint').style.display = 'block';
+   inlineStepInfo.textContent = '步骤数据加载失败';
+ });
+}
+
+function toggleInlinePlay() {
+  const b = inlinePlayBtn;
+  if (inlineTimer) {
+    clearInterval(inlineTimer); inlineTimer = null;
+    b.textContent = '▶ 播放'; return;
+  }
+  if (inlineCur >= inlineSteps.length - 1) inlineCur = -1;
+  b.textContent = '⏸ 暂停';
+  inlineTimer = setInterval(() => {
+    if (inlineCur >= inlineSteps.length - 1) {
+      clearInterval(inlineTimer); inlineTimer = null;
+      b.textContent = '▶ 播放'; return;
+    }
+    inlineCur++;
+    inlineApplyStep(inlineCur);
+  }, 400);
+}
+
+// ── 提交评测 ──
+async function submitCode() {
+  const code = editor.getValue().trim();
+  const btn = document.getElementById('submit-btn');
+  const st = document.getElementById('submit-status');
+  const area = document.getElementById('result-area');
+
+  if (!code) { st.textContent = '请先编写代码'; return; }
+
+  btn.disabled = true; st.textContent = '评测中…'; area.style.display = 'none';
+
+  try {
+    const form = new FormData();
+    form.append('code', code);
+    form.append('csrf_token', document.getElementById('csrf-token').value);
+
+    const resp = await fetch('{{ url_for("submit.submit_code", problem_id=problem.id) }}',
+      { method: 'POST', body: form });
+
+    if (!resp.ok) {
+      const text = await resp.text();
+      let msg = text;
+      try { const j = JSON.parse(text); msg = j.error || msg; } catch(e) {}
+      st.textContent = ''; area.style.display = 'block';
+      document.getElementById('result-summary').innerHTML =
+        `<span class="badge bg-danger">错误</span> ${escHtml(msg)}`;
+      btn.disabled = false;
+      return;
+    }
+
+    const data = await resp.json();
+    const emoji = {pass:'✅', fail:'❌', error:'⚠️', timeout:'⏰'};
+    const labels = {pass:'通过', fail:'未通过', error:'错误', timeout:'超时'};
+    const colors = {pass:'success', fail:'danger', error:'warning', timeout:'warning'};
+
+    st.textContent = ''; area.style.display = 'block';
+    let h = `<span class="res-badge bg-${colors[data.status]||'secondary'}">${emoji[data.status]||''} ${labels[data.status]||data.status}</span>`;
+    h += ` <span class="res-score">${data.score}/100</span>`;
+    h += ` <span class="res-passed">${data.passed} 通过</span>`;
+    if (data.recognized_algo) h += ` <span class="res-algo">${data.recognized_algo}</span>`;
+
+    if (data.grade) {
+      const g = data.grade;
+      h += ` <span class="res-badge" style="background:var(--accent);color:#fff">综合 ${g.total}/${g.max} 分</span>`;
+    }
+    document.getElementById('result-summary').innerHTML = h;
+
+    let det = '';
+    if (data.feedback) det += `<div class="feedback-box"><b>${escHtml(data.feedback.type||'')}:</b> ${escHtml(data.feedback.hint||'')}</div>`;
+
+    if (data.grade) {
+      const g = data.grade;
+      det += `<div class="grade-report"><h4>📊 评分明细</h4><p style="font-size:.76rem;color:var(--muted);margin:0 0 6px">点击各维度展开查看详细说明</p>`;
+      const dims = [
+        {key:'correctness', label:'正确性', icon:'🎯',
+         explain:'正确性通过多组测试用例验证排序输出：① 结果是否单调有序；② 是否与原数组元素完全相同（排列检查）；③ 边界情况（空数组、单元素、重复值等）。'},
+        {key:'algorithm', label:'算法匹配', icon:'🧩',
+         explain:'系统通过 AST 静态分析识别你实现的排序算法类型（冒泡/选择/插入/快速/归并/堆等），并与题目要求对比。算法识别不依赖输出正确性——即使代码有 bug，只要结构特征匹配即可识别。'},
+        {key:'quality', label:'代码质量', icon:'✨',
+         explain:'综合评估代码的语法规范、结构完整性与安全性。检测项包括：语法错误（缺冒号/括号不匹配等）、危险函数调用（eval/exec 等）、函数定义规范（参数数量/返回值/不可达代码）、递归终止条件完整性、循环边界合理性。'},
+        {key:'efficiency', label:'效率', icon:'⚡',
+         explain:'通过多尺度（n=100/500/1000/2000）实测运行时间，拟合估计算法的时间复杂度，并与理论复杂度及题目门槛对比。复杂度分析需点击下方「⏱ 分析复杂度」按钮触发。'}
+      ];
+      dims.forEach(d=>{
+        const v = g[d.key];
+        const pct = Math.round(v.score/v.max*100);
+        const barColor = pct>=80?'var(--success)':pct>=40?'var(--warning)':'var(--danger)';
+        // 行首（可点击折叠）
+        det += `<div class="grade-row" onclick="toggleGradeExpand(this)" title="点击展开/折叠详细说明">
+          <span class="grade-expand-arrow">▶</span>
+          <span class="grade-icon">${d.icon}</span>
+          <span class="grade-label">${d.label}</span>
+          <div class="grade-bar-wrap"><div class="grade-bar" style="width:${pct}%;background:${barColor}"></div></div>
+          <span class="grade-score-num">${v.score}/${v.max}</span>
+          <span class="grade-detail-text">${escHtml(v.detail)}</span>
+        </div>`;
+        // 详细展开面板
+        det += `<div class="grade-detail-expand">`;
+        det += `<div class="explain-title">📋 评分说明</div>`;
+        det += `<div class="explain-text">${d.explain}</div>`;
+        // 各维度专属数据
+        if (d.key === 'correctness') {
+          det += `<div class="explain-title">📋 测试结果</div>`;
+          det += `<div class="explain-text">通过 ${v.passed}/${v.total_cases} 组测试用例</div>`;
+        }
+        if (d.key === 'algorithm') {
+          det += `<div class="explain-title">🔍 识别结果</div>`;
+          det += `<div class="explain-text">检测到: <strong>${escHtml(v.detected||'未知')}</strong> | 题目要求: <strong>${escHtml(v.expected||'不限')}</strong></div>`;
+          if (v.example) {
+            det += `<details class="example-code" style="margin-top:6px"><summary>📖 参考示例代码</summary><pre><code>${escHtml(v.example)}</code></pre></details>`;
+          }
+        }
+        if (d.key === 'quality') {
+          const issues = v.issues || [];
+          if (issues.length > 0) {
+            det += `<div class="explain-title">🔎 检测到的问题 (${issues.length})</div>`;
+            det += `<ul class="issue-list">`;
+            issues.forEach(iss => {
+              let sevClass = iss.severity==='error'?'severity-error':iss.severity==='warning'?'severity-warning':'';
+              let tagClass = iss.severity==='error'?'tag-danger':iss.severity==='warning'?'tag-warn':'tag-info';
+              let sevLabel = iss.severity==='error'?'❌ 错误':iss.severity==='warning'?'⚠️ 提醒':'ℹ️ 提示';
+              det += `<li class="issue-item ${sevClass}">`;
+              det += `<span class="issue-type-tag ${tagClass}">${sevLabel}</span>`;
+              det += `<span>${escHtml(iss.hint||'')}</span>`;
+              if (iss.line) det += ` <span style="color:var(--muted);font-size:.7rem">(第 ${iss.line} 行)</span>`;
+              det += `</li>`;
+            });
+            det += `</ul>`;
+          } else {
+            det += `<div class="explain-text" style="color:var(--success)">✅ 未检测到代码质量问题</div>`;
+          }
+        }
+        if (d.key === 'efficiency') {
+          det += `<div class="explain-title">⏱ 复杂度</div>`;
+          det += `<div class="explain-text">实测估算: <strong>${escHtml(v.estimated||'未分析')}</strong> | 理论值: <strong>${escHtml(v.theoretical||'-')}</strong></div>`;
+          det += `<div class="explain-text" style="font-size:.74rem;color:var(--muted)">点击下方「⏱ 分析复杂度」按钮进行多尺度实测，系统将运行 4 组不同规模的数据并拟合时间曲线。</div>`;
+        }
+        det += `</div>`;
+      });
+      // 参考示例代码（作为单独的折叠块，放在评分明细外部结尾）
+      if (g.algorithm && g.algorithm.example) {
+        det += `<details class="example-code" style="margin-top:8px"><summary>📖 参考示例代码</summary><pre><code>${escHtml(g.algorithm.example)}</code></pre></details>`;
+      }
+      det += `</div>`;
+    }
+
+    det += `<button class="btn-sm" onclick="analyzeComplexity(${data.submission_id})">⏱ 分析复杂度</button>`;
+    det += `<span id="cx-result"></span>`;
+    document.getElementById('result-details').innerHTML = det || '';
+
+    // 触发内联动画（始终展示动画区，有数据则渲染，无数据则显示空状态提示）
+    if (data.detail_ids && data.detail_ids.length > 0) {
+      loadInlineViz(data.submission_id, data.detail_ids[0]);
+    } else {
+      // 无 detail_ids 时也显示动画区，展示空状态
+      const viz = document.getElementById('inline-viz');
+      viz.style.display = 'block';
+      document.getElementById('inline-full-link').href = '/submit/visualize/' + data.submission_id;
+      document.getElementById('inline-play').style.display = 'none';
+      document.getElementById('inline-empty-hint').style.display = 'block';
+      inlineBarContainer.innerHTML = '';
+      inlineYAxis.innerHTML = '';
+      inlineStepInfo.textContent = '暂无排序过程数据';
+    }
+
+  } catch (err) {
+    st.textContent = '提交失败: ' + err.message;
+  } finally { btn.disabled = false; }
+}
+
+// ── 评分明细展开/折叠 ──
+function toggleGradeExpand(row) {
+  row.classList.toggle('expanded');
+}
+
+async function analyzeComplexity(id) {
+  const el = document.getElementById('cx-result');
+  el.textContent = '分析中…';
+  try {
+    const csrf = document.getElementById('csrf-token').value;
+    const resp = await fetch(`/submit/api/complexity/${id}`, {
+      method: 'POST',
+      headers: { 'X-CSRF-Token': csrf }
+    });
+    if (!resp.ok) { el.textContent = '分析失败'; return; }
+    const data = await resp.json();
+    if (data.estimated) {
+      el.textContent = `实测: ${data.estimated} | 理论: ${data.theoretical||'-'}`;
+      if (data.meets_ceiling === false) el.textContent += ' | ⚠️ 未达门槛';
+    }
+  } catch(err) { el.textContent = '分析失败'; }
+}
+</script>
+{% endblock %}

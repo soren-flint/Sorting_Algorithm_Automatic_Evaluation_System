@@ -1,0 +1,207 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 820" font-family="'Microsoft YaHei', 'Noto Sans SC', Arial, sans-serif">
+  <defs>
+    <marker id="arrowAssoc" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#555"/>
+    </marker>
+    <marker id="arrowInclude" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#888"/>
+    </marker>
+    <marker id="arrowExtend" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#888"/>
+    </marker>
+    <filter id="shadow" x="-3%" y="-3%" width="106%" height="106%">
+      <feDropShadow dx="1" dy="1" stdDeviation="2" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="1100" height="820" fill="#fafbfc"/>
+
+  <!-- 标题 -->
+  <text x="550" y="32" text-anchor="middle" font-size="20" font-weight="bold" fill="#1a1a2e">SortJudge 排序评测系统 — 用例图</text>
+  <line x1="380" y1="40" x2="720" y2="40" stroke="#1a1a2e" stroke-width="1.5" stroke-dasharray="4,2"/>
+
+  <!-- ========= 学生角色 ========= -->
+  <!-- 火柴人 -->
+  <circle cx="80" cy="180" r="12" fill="none" stroke="#1565C0" stroke-width="2.2"/>
+  <line x1="80" y1="192" x2="80" y2="235" stroke="#1565C0" stroke-width="2.2"/>
+  <line x1="80" y1="200" x2="60" y2="220" stroke="#1565C0" stroke-width="2"/>
+  <line x1="80" y1="200" x2="100" y2="220" stroke="#1565C0" stroke-width="2"/>
+  <line x1="80" y1="235" x2="62" y2="265" stroke="#1565C0" stroke-width="2"/>
+  <line x1="80" y1="235" x2="98" y2="265" stroke="#1565C0" stroke-width="2"/>
+  <text x="80" y="290" text-anchor="middle" font-size="15" font-weight="bold" fill="#1565C0">学生</text>
+  <text x="80" y="307" text-anchor="middle" font-size="11" fill="#555">Student</text>
+
+  <!-- ========= 教师角色 ========= -->
+  <circle cx="80" cy="460" r="12" fill="none" stroke="#E65100" stroke-width="2.2"/>
+  <line x1="80" y1="472" x2="80" y2="515" stroke="#E65100" stroke-width="2.2"/>
+  <line x1="80" y1="480" x2="60" y2="500" stroke="#E65100" stroke-width="2"/>
+  <line x1="80" y1="480" x2="100" y2="500" stroke="#E65100" stroke-width="2"/>
+  <line x1="80" y1="515" x2="62" y2="545" stroke="#E65100" stroke-width="2"/>
+  <line x1="80" y1="515" x2="98" y2="545" stroke="#E65100" stroke-width="2"/>
+  <text x="80" y="570" text-anchor="middle" font-size="15" font-weight="bold" fill="#E65100">教师</text>
+  <text x="80" y="587" text-anchor="middle" font-size="11" fill="#555">Teacher</text>
+
+  <!-- ========= 系统边界 ========= -->
+  <rect x="190" y="55" width="880" height="740" rx="12" ry="12" fill="#fff" stroke="#1a1a2e" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="190" y="55" width="880" height="34" rx="12" ry="12" fill="#1a1a2e"/>
+  <rect x="190" y="77" width="880" height="12" fill="#1a1a2e"/>
+  <text x="630" y="79" text-anchor="middle" font-size="15" font-weight="bold" fill="#fff">SortJudge 排序算法学习与评测系统</text>
+
+  <!-- ========= 用例节点 ========= -->
+  <!-- 每个用例 node: cx, cy -->
+  <!-- UC1 注册/登录: 420, 140 -->
+  <!-- UC2 浏览题目列表: 630, 140 -->
+  <!-- UC3 内置IDE编写代码: 840, 140 -->
+  <!-- UC4 提交评测: 670, 250 -->
+  <!-- UC5 查看评测结果: 670, 360 -->
+  <!-- UC6 观看可视化回放: 880, 360 -->
+  <!-- UC7 查看提交历史: 420, 310 -->
+  <!-- UC8 教师建题: 380, 500 -->
+  <!-- UC9 代码查重: 580, 500 -->
+  <!-- UC10 复杂度分析: 880, 470 -->
+
+  <!-- UC1: 注册/登录 -->
+  <g filter="url(#shadow)">
+    <ellipse cx="420" cy="140" rx="80" ry="30" fill="#E8EAF6" stroke="#3F51B5" stroke-width="1.8"/>
+  </g>
+  <text x="420" y="137" text-anchor="middle" font-size="13" font-weight="bold" fill="#283593">UC1 注册/登录</text>
+
+  <!-- UC2: 浏览题目列表 -->
+  <g filter="url(#shadow)">
+    <ellipse cx="630" cy="140" rx="92" ry="30" fill="#E8EAF6" stroke="#3F51B5" stroke-width="1.8"/>
+  </g>
+  <text x="630" y="137" text-anchor="middle" font-size="13" font-weight="bold" fill="#283593">UC2 浏览题目列表</text>
+  <text x="630" y="152" text-anchor="middle" font-size="10" fill="#666">(含整活专区)</text>
+
+  <!-- UC3: 内置IDE -->
+  <g filter="url(#shadow)">
+    <ellipse cx="840" cy="140" rx="90" ry="30" fill="#E8EAF6" stroke="#3F51B5" stroke-width="1.8"/>
+  </g>
+  <text x="840" y="137" text-anchor="middle" font-size="13" font-weight="bold" fill="#283593">UC3 IDE编写代码</text>
+  <text x="840" y="152" text-anchor="middle" font-size="10" fill="#666">(CodeMirror)</text>
+
+  <!-- UC4: 提交评测 (核心) -->
+  <g filter="url(#shadow)">
+    <ellipse cx="670" cy="245" rx="130" ry="35" fill="#C8E6C9" stroke="#2E7D32" stroke-width="2.5"/>
+  </g>
+  <text x="670" y="240" text-anchor="middle" font-size="14" font-weight="bold" fill="#1B5E20">UC4 提交评测 ⭐</text>
+  <text x="670" y="256" text-anchor="middle" font-size="11" fill="#2E7D32">(沙箱执行+算法识别+正确性判定)</text>
+
+  <!-- UC5: 查看评测结果 -->
+  <g filter="url(#shadow)">
+    <ellipse cx="670" cy="355" rx="110" ry="30" fill="#FFF3E0" stroke="#F57C00" stroke-width="1.8"/>
+  </g>
+  <text x="670" y="352" text-anchor="middle" font-size="13" font-weight="bold" fill="#E65100">UC5 查看评测结果</text>
+  <text x="670" y="367" text-anchor="middle" font-size="10" fill="#666">(智能反馈+评分)</text>
+
+  <!-- UC6: 可视化回放 -->
+  <g filter="url(#shadow)">
+    <ellipse cx="890" cy="355" rx="100" ry="30" fill="#F3E5F5" stroke="#7B1FA2" stroke-width="1.8"/>
+  </g>
+  <text x="890" y="352" text-anchor="middle" font-size="13" font-weight="bold" fill="#4A148C">UC6 可视化回放</text>
+  <text x="890" y="367" text-anchor="middle" font-size="10" fill="#666">(Canvas动画+音频)</text>
+
+  <!-- UC7: 提交历史 -->
+  <g filter="url(#shadow)">
+    <ellipse cx="420" cy="310" rx="90" ry="30" fill="#E0F7FA" stroke="#00838F" stroke-width="1.8"/>
+  </g>
+  <text x="420" y="307" text-anchor="middle" font-size="13" font-weight="bold" fill="#006064">UC7 提交历史</text>
+
+  <!-- UC8: 教师建题 -->
+  <g filter="url(#shadow)">
+    <ellipse cx="380" cy="500" rx="100" ry="32" fill="#FFEBEE" stroke="#C62828" stroke-width="1.8"/>
+  </g>
+  <text x="380" y="496" text-anchor="middle" font-size="13" font-weight="bold" fill="#B71C1C">UC8 教师建题</text>
+  <text x="380" y="512" text-anchor="middle" font-size="10" fill="#666">(算法/规则/测试用例)</text>
+
+  <!-- UC9: 代码查重 -->
+  <g filter="url(#shadow)">
+    <ellipse cx="580" cy="500" rx="88" ry="32" fill="#FFEBEE" stroke="#C62828" stroke-width="1.8"/>
+  </g>
+  <text x="580" y="496" text-anchor="middle" font-size="13" font-weight="bold" fill="#B71C1C">UC9 代码查重</text>
+  <text x="580" y="512" text-anchor="middle" font-size="10" fill="#666">(AST余弦相似度)</text>
+
+  <!-- UC10: 复杂度分析 -->
+  <g filter="url(#shadow)">
+    <ellipse cx="890" cy="475" rx="98" ry="30" fill="#F3E5F5" stroke="#7B1FA2" stroke-width="1.8"/>
+  </g>
+  <text x="890" y="472" text-anchor="middle" font-size="13" font-weight="bold" fill="#4A148C">UC10 复杂度分析</text>
+  <text x="890" y="487" text-anchor="middle" font-size="10" fill="#666">(多规模实测反推)</text>
+
+  <!-- ========= 关联线：学生 → 用例 ========= -->
+  <line x1="110" y1="175" x2="340" y2="140" stroke="#1565C0" stroke-width="1.5" marker-end="url(#arrowAssoc)"/>
+  <line x1="110" y1="210" x2="538" y2="140" stroke="#1565C0" stroke-width="1.5" marker-end="url(#arrowAssoc)"/>
+  <line x1="115" y1="250" x2="750" y2="145" stroke="#1565C0" stroke-width="1.5" marker-end="url(#arrowAssoc)"/>
+  <line x1="110" y1="230" x2="540" y2="242" stroke="#1565C0" stroke-width="1.5" marker-end="url(#arrowAssoc)"/>
+  <line x1="110" y1="260" x2="558" y2="350" stroke="#1565C0" stroke-width="1.5" marker-end="url(#arrowAssoc)"/>
+  <line x1="110" y1="270" x2="788" y2="350" stroke="#1565C0" stroke-width="1.5" marker-end="url(#arrowAssoc)"/>
+  <line x1="110" y1="300" x2="330" y2="308" stroke="#1565C0" stroke-width="1.5" marker-end="url(#arrowAssoc)"/>
+
+  <!-- ========= 关联线：教师 → 用例 ========= -->
+  <line x1="110" y1="440" x2="340" y2="140" stroke="#E65100" stroke-width="1.5" marker-end="url(#arrowAssoc)"/>
+  <line x1="110" y1="480" x2="538" y2="140" stroke="#E65100" stroke-width="1.5" marker-end="url(#arrowAssoc)"/>
+  <line x1="110" y1="510" x2="280" y2="498" stroke="#E65100" stroke-width="1.5" marker-end="url(#arrowAssoc)"/>
+  <line x1="110" y1="530" x2="492" y2="498" stroke="#E65100" stroke-width="1.5" marker-end="url(#arrowAssoc)"/>
+
+  <!-- ========= include: UC3 → UC4 ========= -->
+  <!-- UC3 底部到 UC4 顶部 -->
+  <line x1="800" y1="170" x2="740" y2="210" stroke="#888" stroke-width="1.8" stroke-dasharray="8,4" marker-end="url(#arrowInclude)"/>
+  <rect x="810" y="175" width="68" height="18" rx="4" fill="#f0f0f0" stroke="#aaa" stroke-width="0.8"/>
+  <text x="844" y="188" text-anchor="middle" font-size="10" font-weight="bold" fill="#666">«include»</text>
+
+  <!-- ========= include: UC4 → UC5 ========= -->
+  <!-- UC4 底部到 UC5 顶部 -->
+  <line x1="670" y1="280" x2="670" y2="325" stroke="#888" stroke-width="1.8" stroke-dasharray="8,4" marker-end="url(#arrowInclude)"/>
+  <rect x="624" y="293" width="68" height="18" rx="4" fill="#f0f0f0" stroke="#aaa" stroke-width="0.8"/>
+  <text x="658" y="306" text-anchor="middle" font-size="10" font-weight="bold" fill="#666">«include»</text>
+
+  <!-- ========= extend: UC4 → UC6 ========= -->
+  <line x1="740" y1="275" x2="850" y2="325" stroke="#888" stroke-width="1.8" stroke-dasharray="8,4" marker-end="url(#arrowExtend)"/>
+  <rect x="758" y="290" width="68" height="18" rx="4" fill="#f0f0f0" stroke="#aaa" stroke-width="0.8"/>
+  <text x="792" y="303" text-anchor="middle" font-size="10" font-weight="bold" fill="#666">«extend»</text>
+
+  <!-- ========= extend: UC4 → UC10 ========= -->
+  <line x1="740" y1="280" x2="850" y2="445" stroke="#888" stroke-width="1.8" stroke-dasharray="8,4" marker-end="url(#arrowExtend)"/>
+  <rect x="760" y="355" width="68" height="18" rx="4" fill="#f0f0f0" stroke="#aaa" stroke-width="0.8"/>
+  <text x="794" y="368" text-anchor="middle" font-size="10" font-weight="bold" fill="#666">«extend»</text>
+
+  <!-- ========= 图例 ========= -->
+  <rect x="550" y="600" width="310" height="175" rx="8" fill="#fff" stroke="#ccc" stroke-width="1"/>
+  <text x="705" y="622" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">图例</text>
+
+  <!-- 角色 -->
+  <circle cx="610" cy="645" r="8" fill="none" stroke="#1565C0" stroke-width="1.8"/>
+  <line x1="610" y1="653" x2="610" y2="670" stroke="#1565C0" stroke-width="1.8"/>
+  <line x1="610" y1="656" x2="600" y2="666" stroke="#1565C0" stroke-width="1.5"/>
+  <line x1="610" y1="656" x2="620" y2="666" stroke="#1565C0" stroke-width="1.5"/>
+  <line x1="610" y1="670" x2="602" y2="680" stroke="#1565C0" stroke-width="1.5"/>
+  <line x1="610" y1="670" x2="618" y2="680" stroke="#1565C0" stroke-width="1.5"/>
+  <text x="645" y="668" font-size="12" fill="#333">Actor（角色）</text>
+
+  <!-- include -->
+  <line x1="595" y1="695" x2="645" y2="695" stroke="#888" stroke-width="1.8" stroke-dasharray="8,4" marker-end="url(#arrowInclude)"/>
+  <text x="660" y="699" font-size="12" fill="#333">«include» 必然触发</text>
+
+  <!-- extend -->
+  <line x1="595" y1="720" x2="645" y2="720" stroke="#888" stroke-width="1.8" stroke-dasharray="8,4" marker-end="url(#arrowExtend)"/>
+  <text x="660" y="724" font-size="12" fill="#333">«extend» 可选扩展</text>
+
+  <!-- 关联 -->
+  <line x1="595" y1="745" x2="645" y2="745" stroke="#555" stroke-width="1.5" marker-end="url(#arrowAssoc)"/>
+  <text x="660" y="749" font-size="12" fill="#333">关联（association）</text>
+
+  <!-- 核心标记 -->
+  <rect x="585" y="760" width="18" height="12" rx="2" fill="#C8E6C9" stroke="#2E7D32" stroke-width="1.5"/>
+  <text x="610" y="770" font-size="11" fill="#2E7D32">⭐ 核心用例</text>
+
+  <!-- 说明 -->
+  <text x="260" y="680" font-size="12" fill="#555">说明：</text>
+  <text x="260" y="698" font-size="11" fill="#666">• UC3(编码) 必然触发 UC4(评测)</text>
+  <text x="260" y="715" font-size="11" fill="#666">• UC4(评测) 必然产生 UC5(结果)</text>
+  <text x="260" y="732" font-size="11" fill="#666">• UC4 可选触发 UC6(可视化) 和 UC10(复杂度)</text>
+  <text x="260" y="749" font-size="11" fill="#666">• 教师可建题、查重，也可浏览题目</text>
+
+  <!-- 页脚 -->
+  <text x="550" y="810" text-anchor="middle" font-size="10" fill="#aaa">SortJudge v1.0 · 实践周题目二 · 2026-06</text>
+</svg>

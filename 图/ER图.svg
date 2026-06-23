@@ -1,0 +1,232 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" font-family="'Microsoft YaHei', 'PingFang SC', 'Noto Sans SC', sans-serif">
+  <defs>
+    <marker id="arrow1" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#666"/>
+    </marker>
+    <marker id="arrow1c" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#e74c3c"/>
+    </marker>
+  </defs>
+
+  <style>
+    text { font-size: 12px; }
+    .title { font-size: 20px; font-weight: bold; fill: #1a1a2e; }
+    .subtitle { font-size: 12px; fill: #888; }
+    .entity-box { fill: #fff; stroke: #333; stroke-width: 1.5; rx: 6; }
+    .entity-header { rx: 6; }
+    .entity-name { fill: #fff; font-weight: bold; font-size: 13px; }
+    .pk { fill: #2ecc71; font-weight: bold; font-size: 10px; }
+    .fk { fill: #e74c3c; font-style: italic; font-size: 10px; }
+    .attr { fill: #333; font-size: 11px; }
+    .attr-type { fill: #999; font-size: 10px; }
+    .sep { stroke: #ccc; stroke-width: 0.5; }
+    .rel-line { stroke: #666; stroke-width: 1.5; fill: none; }
+    .rel-line-cascade { stroke: #e74c3c; stroke-width: 1.5; stroke-dasharray: 6 3; fill: none; }
+    .rel-label { fill: #555; font-size: 10px; }
+    .rel-label-c { fill: #e74c3c; font-size: 9px; }
+  </style>
+
+  <rect width="1200" height="900" fill="#f8f9fa"/>
+
+  <text x="600" y="30" text-anchor="middle" class="title">SortJudge — 数据库实体关系图</text>
+  <text x="600" y="50" text-anchor="middle" class="subtitle">SQLite 数据库 · Flask-SQLAlchemy · 7 张表 · 更新 2026-06-23</text>
+
+  <!-- ============================================================ -->
+  <!-- 用户 -->
+  <!-- ============================================================ -->
+  <rect x="60" y="80" width="200" height="120" class="entity-box"/>
+  <rect x="60" y="80" width="200" height="28" fill="#3498db" class="entity-header"/>
+  <text x="160" y="99" text-anchor="middle" class="entity-name">👤 用户</text>
+
+  <text x="74" y="125" class="pk">主键</text><text x="110" y="125" class="attr">编号</text><text x="200" y="125" text-anchor="end" class="attr-type">整数</text>
+  <line x1="70" y1="131" x2="250" y2="131" class="sep"/>
+  <text x="74" y="146" class="attr">用户名</text><text x="200" y="146" text-anchor="end" class="attr-type">字符串(80) 唯一</text>
+  <line x1="70" y1="152" x2="250" y2="152" class="sep"/>
+  <text x="74" y="167" class="attr">密码哈希</text><text x="200" y="167" text-anchor="end" class="attr-type">字符串(256)</text>
+  <line x1="70" y1="173" x2="250" y2="173" class="sep"/>
+  <text x="74" y="188" class="attr">角色</text><text x="200" y="188" text-anchor="end" class="attr-type">字符串(20)</text>
+
+  <!-- ============================================================ -->
+  <!-- 题目 -->
+  <!-- ============================================================ -->
+  <rect x="440" y="80" width="240" height="236" class="entity-box"/>
+  <rect x="440" y="80" width="240" height="28" fill="#2ecc71" class="entity-header"/>
+  <text x="560" y="99" text-anchor="middle" class="entity-name">📝 题目</text>
+
+  <text x="454" y="125" class="pk">主键</text><text x="490" y="125" class="attr">编号</text><text x="620" y="125" text-anchor="end" class="attr-type">整数</text>
+  <line x1="450" y1="131" x2="670" y2="131" class="sep"/>
+  <text x="454" y="146" class="attr">标题</text><text x="620" y="146" text-anchor="end" class="attr-type">字符串(200)</text>
+  <line x1="450" y1="152" x2="670" y2="152" class="sep"/>
+  <text x="454" y="167" class="attr">描述</text><text x="620" y="167" text-anchor="end" class="attr-type">文本</text>
+  <line x1="450" y1="173" x2="670" y2="173" class="sep"/>
+  <text x="454" y="188" class="attr">难度</text><text x="620" y="188" text-anchor="end" class="attr-type">字符串(20)</text>
+  <line x1="450" y1="194" x2="670" y2="194" class="sep"/>
+  <text x="454" y="209" class="attr">算法类型</text><text x="620" y="209" text-anchor="end" class="attr-type">字符串(50)</text>
+  <line x1="450" y1="215" x2="670" y2="215" class="sep"/>
+  <text x="454" y="230" class="attr">排序规则</text><text x="620" y="230" text-anchor="end" class="attr-type">字符串(20)</text>
+  <line x1="450" y1="236" x2="670" y2="236" class="sep"/>
+  <text x="454" y="251" class="attr">复杂度上限</text><text x="620" y="251" text-anchor="end" class="attr-type">字符串(20) 可空</text>
+  <line x1="450" y1="257" x2="670" y2="257" class="sep"/>
+  <text x="454" y="272" class="attr">示例代码</text><text x="620" y="272" text-anchor="end" class="attr-type">文本</text>
+  <line x1="450" y1="278" x2="670" y2="278" class="sep"/>
+  <text x="454" y="293" class="attr">整活标记</text><text x="620" y="293" text-anchor="end" class="attr-type">布尔</text>
+  <line x1="450" y1="299" x2="670" y2="299" class="sep"/>
+  <text x="454" y="314" class="fk">外键</text><text x="490" y="314" class="attr">创建者 → 用户.编号</text>
+
+  <!-- ============================================================ -->
+  <!-- 测试用例 -->
+  <!-- ============================================================ -->
+  <rect x="850" y="80" width="240" height="120" class="entity-box"/>
+  <rect x="850" y="80" width="240" height="28" fill="#f39c12" class="entity-header"/>
+  <text x="970" y="99" text-anchor="middle" class="entity-name">🧪 测试用例</text>
+
+  <text x="864" y="125" class="pk">主键</text><text x="900" y="125" class="attr">编号</text><text x="1030" y="125" text-anchor="end" class="attr-type">整数</text>
+  <line x1="860" y1="131" x2="1080" y2="131" class="sep"/>
+  <text x="864" y="146" class="fk">外键</text><text x="900" y="146" class="attr">题目编号 → 题目.编号</text>
+  <line x1="860" y1="152" x2="1080" y2="152" class="sep"/>
+  <text x="864" y="167" class="attr">输入数据</text><text x="1030" y="167" text-anchor="end" class="attr-type">文本</text>
+  <line x1="860" y1="173" x2="1080" y2="173" class="sep"/>
+  <text x="864" y="188" class="attr">期望输出</text><text x="1030" y="188" text-anchor="end" class="attr-type">文本 可空</text>
+  <line x1="860" y1="194" x2="1080" y2="194" class="sep"/>
+  <text x="864" y="209" class="attr">公开可见</text><text x="1030" y="209" text-anchor="end" class="attr-type">布尔</text>
+
+  <!-- ============================================================ -->
+  <!-- 提交 -->
+  <!-- ============================================================ -->
+  <rect x="60" y="340" width="220" height="176" class="entity-box"/>
+  <rect x="60" y="340" width="220" height="28" fill="#9b59b6" class="entity-header"/>
+  <text x="170" y="359" text-anchor="middle" class="entity-name">📤 提交记录</text>
+
+  <text x="74" y="385" class="pk">主键</text><text x="110" y="385" class="attr">编号</text><text x="220" y="385" text-anchor="end" class="attr-type">整数</text>
+  <line x1="70" y1="391" x2="270" y2="391" class="sep"/>
+  <text x="74" y="406" class="fk">外键</text><text x="110" y="406" class="attr">用户编号 → 用户.编号</text>
+  <line x1="70" y1="412" x2="270" y2="412" class="sep"/>
+  <text x="74" y="427" class="fk">外键</text><text x="110" y="427" class="attr">题目编号 → 题目.编号</text>
+  <line x1="70" y1="433" x2="270" y2="433" class="sep"/>
+  <text x="74" y="448" class="attr">代码</text><text x="220" y="448" text-anchor="end" class="attr-type">文本</text>
+  <line x1="70" y1="454" x2="270" y2="454" class="sep"/>
+  <text x="74" y="469" class="attr">状态</text><text x="220" y="469" text-anchor="end" class="attr-type">字符串(20)</text>
+  <line x1="70" y1="475" x2="270" y2="475" class="sep"/>
+  <text x="74" y="490" class="attr">得分</text><text x="220" y="490" text-anchor="end" class="attr-type">整数</text>
+  <line x1="70" y1="496" x2="270" y2="496" class="sep"/>
+  <text x="74" y="511" class="attr">识别算法</text><text x="220" y="511" text-anchor="end" class="attr-type">字符串(50) 可空</text>
+  <line x1="70" y1="517" x2="270" y2="517" class="sep"/>
+  <text x="74" y="532" class="attr">提交时间</text><text x="220" y="532" text-anchor="end" class="attr-type">日期时间 索引</text>
+
+  <!-- ============================================================ -->
+  <!-- 提交明细 -->
+  <!-- ============================================================ -->
+  <rect x="440" y="370" width="250" height="148" class="entity-box"/>
+  <rect x="440" y="370" width="250" height="28" fill="#1abc9c" class="entity-header"/>
+  <text x="565" y="389" text-anchor="middle" class="entity-name">📋 提交明细 (每用例一条)</text>
+
+  <text x="454" y="415" class="pk">主键</text><text x="490" y="415" class="attr">编号</text><text x="630" y="415" text-anchor="end" class="attr-type">整数</text>
+  <line x1="450" y1="421" x2="680" y2="421" class="sep"/>
+  <text x="454" y="436" class="fk">外键</text><text x="490" y="436" class="attr">提交编号 → 提交.编号</text>
+  <line x1="450" y1="442" x2="680" y2="442" class="sep"/>
+  <text x="454" y="457" class="fk">外键</text><text x="490" y="457" class="attr">用例编号 → 测试用例.编号</text>
+  <line x1="450" y1="463" x2="680" y2="463" class="sep"/>
+  <text x="454" y="478" class="attr">输入数组</text><text x="630" y="478" text-anchor="end" class="attr-type">文本 可空</text>
+  <line x1="450" y1="484" x2="680" y2="484" class="sep"/>
+  <text x="454" y="499" class="attr">实际输出</text><text x="630" y="499" text-anchor="end" class="attr-type">文本 可空</text>
+  <line x1="450" y1="505" x2="680" y2="505" class="sep"/>
+  <text x="454" y="520" class="attr">是否通过</text><text x="630" y="520" text-anchor="end" class="attr-type">布尔</text>
+  <line x1="450" y1="526" x2="680" y2="526" class="sep"/>
+  <text x="454" y="541" class="attr">反馈信息</text><text x="630" y="541" text-anchor="end" class="attr-type">文本 可空</text>
+
+  <!-- ============================================================ -->
+  <!-- 排序步骤 -->
+  <!-- ============================================================ -->
+  <rect x="850" y="340" width="260" height="220" class="entity-box"/>
+  <rect x="850" y="340" width="260" height="28" fill="#e74c3c" class="entity-header"/>
+  <text x="980" y="359" text-anchor="middle" class="entity-name">🎬 排序步骤 (可视化数据)</text>
+
+  <text x="864" y="385" class="pk">主键</text><text x="900" y="385" class="attr">编号</text><text x="1050" y="385" text-anchor="end" class="attr-type">整数</text>
+  <line x1="860" y1="391" x2="1100" y2="391" class="sep"/>
+  <text x="864" y="406" class="fk">外键</text><text x="900" y="406" class="attr">明细编号 → 提交明细.编号</text>
+  <line x1="860" y1="412" x2="1100" y2="412" class="sep"/>
+  <text x="864" y="427" class="attr">步骤序号</text><text x="1050" y="427" text-anchor="end" class="attr-type">整数 索引</text>
+  <line x1="860" y1="433" x2="1100" y2="433" class="sep"/>
+  <text x="864" y="448" class="attr">数组状态</text><text x="1050" y="448" text-anchor="end" class="attr-type">文本(JSON)</text>
+  <line x1="860" y1="454" x2="1100" y2="454" class="sep"/>
+  <text x="864" y="469" class="attr">操作类型</text><text x="1050" y="469" text-anchor="end" class="attr-type">字符串(20)</text>
+  <line x1="860" y1="475" x2="1100" y2="475" class="sep"/>
+  <text x="864" y="490" class="attr">索引 i, j</text><text x="1050" y="490" text-anchor="end" class="attr-type">整数 可空</text>
+  <line x1="860" y1="496" x2="1100" y2="496" class="sep"/>
+  <text x="864" y="511" class="attr">步骤说明</text><text x="1050" y="511" text-anchor="end" class="attr-type">文本 可空</text>
+  <line x1="860" y1="517" x2="1100" y2="517" class="sep"/>
+  <text x="864" y="532" class="attr">高亮行号</text><text x="1050" y="532" text-anchor="end" class="attr-type">整数 可空</text>
+  <line x1="860" y1="538" x2="1100" y2="538" class="sep"/>
+  <text x="864" y="553" class="attr">轮次</text><text x="1050" y="553" text-anchor="end" class="attr-type">整数 可空</text>
+
+  <!-- ============================================================ -->
+  <!-- 复杂度分析 -->
+  <!-- ============================================================ -->
+  <rect x="60" y="600" width="240" height="176" class="entity-box"/>
+  <rect x="60" y="600" width="240" height="28" fill="#34495e" class="entity-header"/>
+  <text x="180" y="619" text-anchor="middle" class="entity-name">⏱ 复杂度分析</text>
+
+  <text x="74" y="645" class="pk">主键</text><text x="110" y="645" class="attr">编号</text><text x="240" y="645" text-anchor="end" class="attr-type">整数</text>
+  <line x1="70" y1="651" x2="290" y2="651" class="sep"/>
+  <text x="74" y="666" class="fk">外键</text><text x="110" y="666" class="attr">提交编号 → 提交.编号</text><text x="240" y="666" text-anchor="end" class="attr-type">唯一</text>
+  <line x1="70" y1="672" x2="290" y2="672" class="sep"/>
+  <text x="74" y="687" class="attr">估算复杂度</text><text x="240" y="687" text-anchor="end" class="attr-type">字符串(20) 可空</text>
+  <line x1="70" y1="693" x2="290" y2="693" class="sep"/>
+  <text x="74" y="708" class="attr">理论复杂度</text><text x="240" y="708" text-anchor="end" class="attr-type">字符串(20) 可空</text>
+  <line x1="70" y1="714" x2="290" y2="714" class="sep"/>
+  <text x="74" y="729" class="attr">计时数据</text><text x="240" y="729" text-anchor="end" class="attr-type">文本(JSON) 可空</text>
+  <line x1="70" y1="735" x2="290" y2="735" class="sep"/>
+  <text x="74" y="750" class="attr">计时比率</text><text x="240" y="750" text-anchor="end" class="attr-type">浮点 可空</text>
+  <line x1="70" y1="756" x2="290" y2="756" class="sep"/>
+  <text x="74" y="771" class="attr">满足上限</text><text x="240" y="771" text-anchor="end" class="attr-type">布尔 可空</text>
+  <line x1="70" y1="777" x2="290" y2="777" class="sep"/>
+  <text x="74" y="792" class="attr">分析时间</text><text x="240" y="792" text-anchor="end" class="attr-type">日期时间</text>
+
+  <!-- ============================================================ -->
+  <!-- 关系连线 -->
+  <!-- ============================================================ -->
+
+  <!-- 用户 1:N 提交 -->
+  <path d="M170,200 L170,340" class="rel-line" marker-end="url(#arrow1)"/>
+  <text x="178" y="275" class="rel-label">一对多</text>
+  <text x="178" y="290" class="rel-label">提交列表</text>
+
+  <!-- 题目 1:N 提交 -->
+  <path d="M520,316 L520,370" class="rel-line" marker-end="url(#arrow1)"/>
+  <text x="528" y="345" class="rel-label">一对多</text>
+
+  <!-- 题目 1:N 测试用例 (级联) -->
+  <path d="M680,198 L850,140" class="rel-line-cascade" marker-end="url(#arrow1c)"/>
+  <text x="745" y="158" class="rel-label-c">一对多 级联删除</text>
+
+  <!-- 题目 N:1 用户 (创建者) -->
+  <path d="M260,200 L440,200" class="rel-line" marker-end="url(#arrow1)"/>
+  <text x="330" y="192" class="rel-label">多对一 创建者</text>
+
+  <!-- 提交 1:N 明细 (级联) -->
+  <path d="M280,440 L440,440" class="rel-line-cascade" marker-end="url(#arrow1c)"/>
+  <text x="340" y="432" class="rel-label-c">一对多 级联删除</text>
+
+  <!-- 测试用例 1:N 明细 -->
+  <path d="M850,200 L690,370" class="rel-line" marker-end="url(#arrow1)"/>
+  <text x="750" y="290" class="rel-label">一对多</text>
+
+  <!-- 明细 1:N 步骤 (级联) -->
+  <path d="M690,440 L850,440" class="rel-line-cascade" marker-end="url(#arrow1c)"/>
+  <text x="755" y="432" class="rel-label-c">一对多 级联删除</text>
+
+  <!-- 提交 1:1 复杂度 (级联, 唯一) -->
+  <path d="M180,516 L180,600" class="rel-line-cascade" marker-end="url(#arrow1c)"/>
+  <text x="188" y="565" class="rel-label-c">一对一 级联删除 (唯一外键)</text>
+
+  <!-- 图例 -->
+  <rect x="440" y="600" width="360" height="95" rx="6" fill="#fff" stroke="#ddd" stroke-width="1"/>
+  <text x="455" y="622" font-weight="bold" font-size="13" fill="#333">图例</text>
+  <line x1="455" y1="638" x2="495" y2="638" class="rel-line"/>
+  <text x="502" y="642" class="rel-label">普通关系（数据保留，不级联删除）</text>
+  <line x1="455" y1="658" x2="495" y2="658" class="rel-line-cascade"/>
+  <text x="502" y="662" class="rel-label-c">级联关系（父记录删除时子记录自动删除）</text>
+  <text x="455" y="682" fill="#2ecc71" font-size="11">■ 主键 = 主键（自增整数）</text>
+  <text x="640" y="682" fill="#e74c3c" font-size="11">■ 外键 = 外键引用</text>
+
+</svg>

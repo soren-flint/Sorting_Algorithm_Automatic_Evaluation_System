@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}教师仪表盘 — 排序算法学习系统{% endblock %}
+{% block content %}
+
+<h2 style="margin-bottom:16px">📊 教师仪表盘</h2>
+
+<div class="teacher-bar" style="margin-bottom:20px">
+  <span class="stat">题目 {{ stats.problem_count }}</span>
+  <span class="stat">提交 {{ stats.submission_count }}</span>
+  <span class="stat">学生 {{ stats.student_count }}</span>
+  <span class="stat">通过 {{ stats.pass_count }}</span>
+  <span style="flex:1"></span>
+  <a href="{{ url_for('teacher.create_problem') }}" class="btn-sm primary">+ 新建题目</a>
+  <a href="{{ url_for('teacher.similarity_check') }}" class="btn-sm secondary">查重</a>
+</div>
+
+{% if recent_subs %}
+<h3 style="font-size:.85rem;color:var(--muted);margin-bottom:8px">最近提交</h3>
+<table>
+  <thead>
+    <tr>
+      <th>时间</th>
+      <th>学生</th>
+      <th>题目</th>
+      <th>状态</th>
+      <th>得分</th>
+      <th>算法</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for sub in recent_subs %}
+    <tr>
+      <td style="font-size:.78rem;color:var(--muted)">{{ sub.submitted_at.strftime('%m-%d %H:%M') }}</td>
+      <td>{{ sub.user.username }}</td>
+      <td>{{ sub.problem.title[:20] }}{% if sub.problem.title|length > 20 %}…{% endif %}</td>
+      <td>
+        {% if sub.status == 'pass' %}
+        <span class="tag tag-success">通过</span>
+        {% elif sub.status == 'fail' %}
+        <span class="tag tag-danger">失败</span>
+        {% elif sub.status == 'error' %}
+        <span class="tag tag-warning">错误</span>
+        {% elif sub.status == 'timeout' %}
+        <span class="tag tag-warning">超时</span>
+        {% else %}
+        <span class="tag tag-muted">{{ sub.status }}</span>
+        {% endif %}
+      </td>
+      <td style="font-family:JetBrains Mono,monospace">{{ sub.score }}</td>
+      <td style="font-family:JetBrains Mono,monospace;font-size:.78rem">{{ sub.recognized_algo or '-' }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="text-center py-4 text-muted">暂无提交记录。</div>
+{% endif %}
+{% endblock %}

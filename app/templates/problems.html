@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %}题目列表 — 排序算法学习系统{% endblock %}
+{% block content %}
+
+<!-- Hero 引导区 -->
+<div class="hero-section">
+  <div class="hero-content">
+    <h1 class="hero-title">排序算法学习与评测系统</h1>
+    <p class="hero-desc">
+      在浏览器中编写排序算法，一键提交评测，观看可视化回放。
+      支持冒泡、选择、插入、快速、归并、堆排序，还有整活专区等你挑战。
+    </p>
+    <div class="hero-actions">
+      {% if normal_problems %}
+      <a href="#problem-area" class="btn primary hero-btn">🚀 开始做题</a>
+      {% endif %}
+      {% if meme_problems %}
+      <a href="#meme-area" class="btn secondary hero-btn">🤪 逛逛整活区</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% if is_teacher %}
+<!-- 教师统计条 + 操作入口 -->
+<div class="teacher-bar">
+  <span class="text-muted" style="font-size:.82rem">教师视图</span>
+  <span class="stat">题目 {{ teacher_stats.problem_count }}</span>
+  <span class="stat">提交 {{ teacher_stats.submission_count }}</span>
+  <span class="stat">学生 {{ teacher_stats.student_count }}</span>
+  <span class="stat">通过 {{ teacher_stats.pass_count }}</span>
+  <span style="flex:1"></span>
+  <a href="{{ url_for('teacher.create_problem') }}" class="btn-sm primary">+ 新建题目</a>
+  <a href="{{ url_for('teacher.similarity_check') }}" class="btn-sm secondary">查重</a>
+</div>
+{% endif %}
+
+<!-- 常规题目 -->
+{% set normal_problems = problems | selectattr('is_meme', 'equalto', False) | list %}
+{% if normal_problems %}
+<div id="problem-area" class="problem-grid">
+  {% for p in normal_problems %}
+  <div class="problem-card">
+    <h3>{{ p.title }}</h3>
+    <div class="meta">
+      <span class="tag tag-diff">{{ p.difficulty }}</span>
+      <span class="tag tag-algo">{{ p.algo_type }}</span>
+      <span class="tag tag-rule">{{ p.sort_rule }}</span>
+    </div>
+    {% if p.example_code %}
+    <details class="example-code">
+      <summary>📖 查看示例代码</summary>
+      <pre><code>{{ p.example_code }}</code></pre>
+    </details>
+    {% endif %}
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+      <a href="{{ url_for('problem.problem_detail', problem_id=p.id) }}"
+         class="btn-sm primary">开始做题</a>
+      {% if is_teacher %}
+      <a href="{{ url_for('teacher.edit_problem', problem_id=p.id) }}"
+         class="btn-sm ghost">编辑</a>
+      <form method="POST" action="{{ url_for('teacher.delete_problem', problem_id=p.id) }}"
+            style="display:inline;"
+            onsubmit="return confirm('确定删除「{{ p.title }}」？此操作不可撤销。');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn-sm ghost" style="color:var(--danger)">删除</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- 整活专区 -->
+{% set meme_problems = problems | selectattr('is_meme', 'equalto', True) | list %}
+{% if meme_problems %}
+<div id="meme-area" class="meme-section">
+  <div class="meme-toggle" onclick="toggleMeme()" title="点击展开整活专区">
+    <!-- SVG 手绘小眼睛 -->
+    <svg class="meme-eye" viewBox="0 0 48 32" width="36" height="24">
+      <!-- 眼眶 -->
+      <ellipse cx="16" cy="16" rx="13" ry="12" fill="none" stroke="var(--muted)" stroke-width="2.5"
+               stroke-linecap="round" stroke-dasharray="2 2"/>
+      <!-- 眼珠 -->
+      <circle cx="16" cy="16" r="5" fill="var(--body-c)" opacity="0.7"/>
+      <circle cx="14" cy="14" r="1.8" fill="#fff" opacity="0.8"/>
+      <!-- 第二只眼 -->
+      <ellipse cx="32" cy="16" rx="13" ry="12" fill="none" stroke="var(--muted)" stroke-width="2.5"
+               stroke-linecap="round" stroke-dasharray="2 2"/>
+      <circle cx="32" cy="16" r="5" fill="var(--body-c)" opacity="0.7"/>
+      <circle cx="30" cy="14" r="1.8" fill="#fff" opacity="0.8"/>
+    </svg>
+    <span class="meme-label">整活专区</span>
+    <span class="meme-count">{{ meme_problems | length }}</span>
+  </div>
+  <div class="meme-grid" id="meme-grid" style="display:none">
+    {% for p in meme_problems %}
+    <div class="problem-card meme-card">
+      <h3>{{ p.title }}</h3>
+      <div class="meta">
+        <span class="tag tag-diff">{{ p.difficulty }}</span>
+        <span class="tag tag-algo">{{ p.algo_type }}</span>
+        <span class="tag tag-rule">{{ p.sort_rule }}</span>
+      </div>
+      {% if p.example_code %}
+      <details class="example-code">
+        <summary>📖 查看示例代码</summary>
+        <pre><code>{{ p.example_code }}</code></pre>
+      </details>
+      {% endif %}
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <a href="{{ url_for('problem.problem_detail', problem_id=p.id) }}"
+           class="btn-sm primary">开始做题</a>
+        {% if is_teacher %}
+        <a href="{{ url_for('teacher.edit_problem', problem_id=p.id) }}"
+           class="btn-sm ghost">编辑</a>
+        <form method="POST" action="{{ url_for('teacher.delete_problem', problem_id=p.id) }}"
+              style="display:inline;"
+              onsubmit="return confirm('确定删除「{{ p.title }}」？此操作不可撤销。');">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn-sm ghost" style="color:var(--danger)">删除</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% if not problems %}
+<div class="text-center py-5 text-muted">
+  <p>暂无题目。{% if is_teacher %}点击上方「+ 新建题目」创建。{% else %}请联系教师创建。{% endif %}</p>
+</div>
+{% endif %}
+
+<script>
+function toggleMeme() {
+  const grid = document.getElementById('meme-grid');
+  if (grid.style.display === 'none') {
+    grid.style.display = 'grid';
+    localStorage.setItem('meme-open', '1');
+  } else {
+    grid.style.display = 'none';
+    localStorage.setItem('meme-open', '0');
+  }
+}
+// 记忆展开状态
+if (localStorage.getItem('meme-open') === '1') {
+  document.getElementById('meme-grid').style.display = 'grid';
+}
+</script>
+{% endblock %}

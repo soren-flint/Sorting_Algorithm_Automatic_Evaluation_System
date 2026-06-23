@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" font-family="'Microsoft YaHei', 'PingFang SC', 'Noto Sans SC', sans-serif">
+  <defs>
+    <marker id="call" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#555"/>
+    </marker>
+  </defs>
+
+  <style>
+    text { font-size: 11px; }
+    .title { font-size: 20px; font-weight: bold; fill: #1a1a2e; }
+    .subtitle { font-size: 12px; fill: #888; }
+    .bp-box { fill: #fff; stroke: #333; stroke-width: 1.8; rx: 10; }
+    .bp-header { rx: 10; }
+    .bp-name { fill: #fff; font-weight: bold; font-size: 14px; }
+    .route { fill: #2c3e50; font-size: 10.5px; }
+    .route-method { font-weight: bold; font-size: 9px; }
+    .route-get { fill: #27ae60; }
+    .route-post { fill: #e74c3c; }
+    .sep { stroke: #ddd; stroke-width: 0.5; }
+    .call-line { stroke: #555; stroke-width: 1.5; fill: none; }
+    .call-label { fill: #555; font-size: 9px; }
+    .core-box { fill: #fefefe; stroke: #888; stroke-width: 1; rx: 6; stroke-dasharray: 5 3; }
+  </style>
+
+  <!-- 背景 -->
+  <rect width="1200" height="720" fill="#f8f9fa"/>
+
+  <!-- 标题 -->
+  <text x="600" y="28" text-anchor="middle" class="title">SortJudge — 路由与蓝图架构</text>
+  <text x="600" y="48" text-anchor="middle" class="subtitle">4 个蓝图 · 18 条路由 · Flask + Jinja2 + SQLAlchemy · 更新 2026-06-23</text>
+
+  <!-- ============================================================ -->
+  <!-- 认证蓝图 -->
+  <!-- ============================================================ -->
+  <rect x="40" y="70" width="250" height="150" class="bp-box"/>
+  <rect x="40" y="70" width="250" height="30" fill="#3498db" class="bp-header"/>
+  <text x="165" y="90" text-anchor="middle" class="bp-name">🔑 认证蓝图 /auth</text>
+
+  <text x="55" y="120" class="route-method route-get">GET</text><text x="85" y="120" class="route">/auth/register — 注册表单</text>
+  <text x="55" y="135" class="route-method route-post">POST</text><text x="88" y="135" class="route">/auth/register — 注册处理</text>
+  <line x1="50" y1="142" x2="280" y2="142" class="sep"/>
+  <text x="55" y="157" class="route-method route-get">GET</text><text x="85" y="157" class="route">/auth/login — 登录表单</text>
+  <text x="55" y="172" class="route-method route-post">POST</text><text x="88" y="172" class="route">/auth/login — 登录处理</text>
+  <line x1="50" y1="179" x2="280" y2="179" class="sep"/>
+  <text x="55" y="194" class="route-method route-get">GET</text><text x="85" y="194" class="route">/auth/logout — 登出</text>
+  <text x="55" y="215" fill="#888" font-size="9">🔓 注册与登录无需认证 | 登出需 @login_required</text>
+
+  <!-- ============================================================ -->
+  <!-- 题目蓝图 -->
+  <!-- ============================================================ -->
+  <rect x="330" y="70" width="250" height="120" class="bp-box"/>
+  <rect x="330" y="70" width="250" height="30" fill="#2ecc71" class="bp-header"/>
+  <text x="455" y="90" text-anchor="middle" class="bp-name">📝 题目蓝图 /problems</text>
+
+  <text x="345" y="120" class="route-method route-get">GET</text><text x="375" y="120" class="route">/problems/ — 题目列表</text>
+  <line x1="340" y1="127" x2="570" y2="127" class="sep"/>
+  <text x="345" y="142" class="route-method route-get">GET</text><text x="375" y="142" class="route">/problems/&lt;编号&gt; — 题目详情 + 代码编辑器</text>
+  <text x="345" y="168" fill="#888" font-size="9">🔒 全部路由需 @login_required</text>
+
+  <!-- ============================================================ -->
+  <!-- 提交蓝图 (核心) -->
+  <!-- ============================================================ -->
+  <rect x="620" y="70" width="320" height="250" class="bp-box"/>
+  <rect x="620" y="70" width="320" height="30" fill="#e74c3c" class="bp-header"/>
+  <text x="780" y="90" text-anchor="middle" class="bp-name">🚀 提交蓝图 /submit ★ 核心评测</text>
+
+  <text x="635" y="120" class="route-method route-post">POST</text><text x="668" y="120" class="route">/submit/&lt;编号&gt; — 提交代码评测 (JSON)</text>
+  <line x1="630" y1="127" x2="930" y2="127" class="sep"/>
+  <text x="635" y="142" class="route-method route-get">GET</text><text x="665" y="142" class="route">/submit/history — 提交历史列表</text>
+  <line x1="630" y1="149" x2="930" y2="149" class="sep"/>
+  <text x="635" y="164" class="route-method route-get">GET</text><text x="665" y="164" class="route">/submit/result/&lt;编号&gt; — 单次评测详情</text>
+  <line x1="630" y1="171" x2="930" y2="171" class="sep"/>
+  <text x="635" y="186" class="route-method route-get">GET</text><text x="665" y="186" class="route">/submit/visualize/&lt;编号&gt; — 🎬 可视化动画</text>
+  <line x1="630" y1="193" x2="930" y2="193" class="sep"/>
+  <text x="635" y="208" class="route-method route-get">GET</text><text x="665" y="208" class="route">/submit/api/steps/&lt;编号&gt; — 步骤数据 API</text>
+  <line x1="630" y1="215" x2="930" y2="215" class="sep"/>
+  <text x="635" y="230" class="route-method route-post">POST</text><text x="668" y="230" class="route">/submit/api/complexity/&lt;编号&gt; — 复杂度分析 API</text>
+  <text x="635" y="260" fill="#888" font-size="9">🔒 @login_required · JSON API · 评测流水线入口</text>
+  <text x="635" y="278" fill="#888" font-size="9">调用全部 16 个核心引擎模块完成评测</text>
+  <text x="635" y="298" fill="#888" font-size="9">GET 步骤API 供前端可视化拉取排序过程数据</text>
+
+  <!-- ============================================================ -->
+  <!-- 教师蓝图 -->
+  <!-- ============================================================ -->
+  <rect x="40" y="260" width="250" height="210" class="bp-box"/>
+  <rect x="40" y="260" width="250" height="30" fill="#9b59b6" class="bp-header"/>
+  <text x="165" y="280" text-anchor="middle" class="bp-name">👨‍🏫 教师蓝图 /teacher</text>
+
+  <text x="55" y="310" class="route-method route-get">GET</text><text x="85" y="310" class="route">/teacher/ — 教师仪表板</text>
+  <line x1="50" y1="317" x2="280" y2="317" class="sep"/>
+  <text x="55" y="332" class="route-method route-get">GET</text><text x="85" y="332" class="route">/teacher/problems — 题目管理列表</text>
+  <line x1="50" y1="339" x2="280" y2="339" class="sep"/>
+  <text x="55" y="354" class="route-method route-get">GET</text><text x="85" y="354" class="route">/teacher/problems/new — 创建题目表单</text>
+  <text x="55" y="369" class="route-method route-post">POST</text><text x="88" y="369" class="route">/teacher/problems/new — 创建处理</text>
+  <line x1="50" y1="376" x2="280" y2="376" class="sep"/>
+  <text x="55" y="391" class="route-method route-get">GET</text><text x="85" y="391" class="route">/teacher/problems/&lt;编号&gt;/edit — 编辑题目</text>
+  <text x="55" y="406" class="route-method route-post">POST</text><text x="88" y="406" class="route">/teacher/problems/&lt;编号&gt;/edit — 更新题目</text>
+  <line x1="50" y1="413" x2="280" y2="413" class="sep"/>
+  <text x="55" y="428" class="route-method route-post">POST</text><text x="88" y="428" class="route">/teacher/problems/&lt;编号&gt;/delete — 删除题目</text>
+  <line x1="50" y1="435" x2="280" y2="435" class="sep"/>
+  <text x="55" y="450" class="route-method route-get">GET</text><text x="85" y="450" class="route">/teacher/similarity — 查重检测表单</text>
+  <text x="55" y="465" class="route-method route-post">POST</text><text x="88" y="465" class="route">/teacher/similarity — 执行查重检测</text>
+  <text x="55" y="490" fill="#888" font-size="9">🔒 @login_required + @teacher_required</text>
+
+  <!-- ============================================================ -->
+  <!-- 核心引擎框 -->
+  <!-- ============================================================ -->
+  <rect x="330" y="260" width="610" height="110" class="core-box"/>
+  <text x="635" y="282" text-anchor="middle" font-weight="bold" font-size="13" fill="#555">app/core/ — 核心引擎 (16 个模块 · 无 Flask 依赖 · 可独立测试)</text>
+  <text x="345" y="304" font-size="9.5" fill="#666">评分引擎 · 智能反馈 · 算法识别 · 代码标记 · 语义校验 · 排序模拟器</text>
+  <text x="345" y="320" font-size="9.5" fill="#666">步骤采集 · 输出比对 · 正确性验证 · 复杂度估算 · 沙箱执行 · 步骤拦截列表</text>
+  <text x="345" y="336" font-size="9.5" fill="#666">代码查重 · 算法档案 · 参考代码库</text>
+  <text x="345" y="358" font-size="9" fill="#888">全部可独立 pytest 测试 → 172+ 测试用例覆盖</text>
+
+  <!-- 提交蓝图 → 核心引擎调用关系 -->
+  <path d="M780,320 L780,370" class="call-line" marker-end="url(#call)"/>
+  <text x="788" y="348" class="call-label">评测流水线调用全部引擎模块</text>
+
+  <!-- ============================================================ -->
+  <!-- 图例 -->
+  <!-- ============================================================ -->
+  <rect x="330" y="405" width="320" height="85" rx="6" fill="#fff" stroke="#ddd" stroke-width="1"/>
+  <text x="345" y="425" font-weight="bold" font-size="12" fill="#333">图例</text>
+  <text x="345" y="445" font-size="10" fill="#27ae60">GET</text><text x="375" y="445" font-size="10" fill="#555">查询操作 / 页面渲染</text>
+  <text x="345" y="461" font-size="10" fill="#e74c3c">POST</text><text x="378" y="461" font-size="10" fill="#555">数据提交 / 状态变更</text>
+  <text x="345" y="477" font-size="9" fill="#888">🔒 @login_required — 需要登录认证</text>
+  <text x="345" y="493" font-size="9" fill="#888">🔒🔒 + @teacher_required — 需要教师权限</text>
+
+</svg>

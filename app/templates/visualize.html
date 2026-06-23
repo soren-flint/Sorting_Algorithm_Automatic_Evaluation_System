@@ -1,0 +1,1122 @@
+{% extends "base.html" %}
+{% block title %}可视化回放 — {{ submission.problem.title }}{% endblock %}
+{% block content %}
+
+<div class="viz-main-container">
+  <!-- Header -->
+  <div class="viz-header">
+    <div class="viz-header-title">{{ submission.problem.title }} · 多模态学习</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <span class="viz-badge viz-badge-visual">📊 视觉</span>
+      <span class="viz-badge viz-badge-code">💻 代码</span>
+      <span class="viz-badge viz-badge-text">💬 文字</span>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="viz-content">
+    <!-- 左侧：可视化面板 -->
+    <div class="viz-visual-panel">
+      <div class="viz-section-label">📊 可视化动画（条形图 + Y轴）</div>
+      <div class="viz-bar-chart-outer">
+        <div class="viz-y-axis" id="vizYAxis"></div>
+        <div class="viz-bar-container" id="vizBarContainer"></div>
+      </div>
+      <div class="viz-legend-row">
+        <span><span class="viz-legend-swatch" style="background:var(--accent)"></span> 未排序</span>
+        <span><span class="viz-legend-swatch" style="background:var(--warning)"></span> 比较中</span>
+        <span><span class="viz-legend-swatch" style="background:var(--danger)"></span> 交换中</span>
+        <span><span class="viz-legend-swatch" style="background:var(--success)"></span> 已就位</span>
+      </div>
+    </div>
+
+    <!-- 右侧：代码 + 说明 -->
+    <div class="viz-info-panel">
+      <!-- 代码面板 -->
+      <div class="viz-code-section">
+        <div class="viz-section-label" style="display:flex;align-items:center;gap:8px">
+          <span id="codePanelLabel">💻 你的代码</span>
+          <span class="viz-badge viz-badge-code" id="codeAlgoTag" style="font-size:.65rem">{{ submission.recognized_algo or '' }}</span>
+        </div>
+        <div class="viz-code-block" id="vizCodeBlock"></div>
+      </div>
+      <!-- 说明面板 -->
+      <div class="viz-desc-section">
+        <div class="viz-section-label">💬 步骤说明</div>
+        <div class="viz-desc-box" id="vizDescBox">
+          👋 欢迎！选择一个测试用例开始，或切换到演示模式体验不同算法。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 控制栏 -->
+  <div class="viz-control-bar">
+    <button class="viz-btn viz-btn-play" id="btnPlay">▶ 开始</button>
+    <button class="viz-btn viz-btn-step" id="btnStep">⏭ 单步</button>
+    <button class="viz-btn viz-btn-reset" id="btnReset">🔄 重置</button>
+    <button class="viz-btn viz-btn-mode" id="btnStepMode">📋 单步模式</button>
+    <span style="color:var(--muted);font-weight:600;font-size:.8rem">速度：</span>
+    <button class="viz-btn viz-btn-speed active" data-speed="1200">慢</button>
+    <button class="viz-btn viz-btn-speed" data-speed="800">中</button>
+    <button class="viz-btn viz-btn-speed" data-speed="400">快</button>
+    <button class="viz-btn viz-btn-speed" data-speed="150">极快</button>
+
+    <!-- 数据源切换 -->
+    <select id="dataSource" onchange="switchDataSource()" style="margin-left:8px;border-radius:16px;padding:4px 10px;font-size:.75rem;border:2px solid var(--border);background:var(--surface);color:var(--body-c)">
+      <option value="replay" selected>📡 回放模式</option>
+      <option value="demo">🎮 演示模式</option>
+    </select>
+    <select id="algoSelect" onchange="switchAlgo()" style="display:none;border-radius:16px;padding:4px 10px;font-size:.75rem;border:2px solid var(--border);background:var(--surface);color:var(--body-c)">
+      <option value="bubble">冒泡排序</option>
+      <option value="select">选择排序</option>
+      <option value="insert">插入排序</option>
+      <option value="quick">快速排序</option>
+      <option value="merge">归并排序</option>
+<option value="heap">堆排序</option>
+	      <option value="stalin">斯大林排序</option>
+	      <option value="merciful_stalin">仁慈斯大林排序</option>
+	      <option value="sleep">💤 睡眠排序</option>
+	    </select>
+    <span id="replayDetailWrap">
+      <select id="detailSelect" onchange="loadReplaySteps()" style="border-radius:16px;padding:4px 10px;font-size:.75rem;border:2px solid var(--border);background:var(--surface);color:var(--body-c);max-width:160px">
+        {% for d in details %}
+        <option value="{{ d.id }}">{{ d.test_case.input_data[:25] if d.test_case else '#' ~ d.id }}</option>
+        {% endfor %}
+      </select>
+    </span>
+<span id="demoInputWrap" style="display:none">
+	      <span style="color:var(--muted);font-weight:600;font-size:.75rem;margin-right:4px">规模：</span>
+	      <button class="viz-btn viz-btn-speed" data-size="5" onclick="setArraySize(5, this)" style="font-size:.7rem;padding:2px 8px">5</button>
+	      <button class="viz-btn viz-btn-speed active" data-size="10" onclick="setArraySize(10, this)" style="font-size:.7rem;padding:2px 8px">10</button>
+	      <input id="demoInput" type="text" value="8,3,5,1,9,2,6,4,7,0" style="width:170px;border-radius:16px;padding:4px 10px;font-size:.75rem;border:2px solid var(--border);background:var(--surface);color:var(--body-c)" onchange="genDemoSteps()">
+	      <button class="viz-btn viz-btn-step" onclick="randomInput()" title="随机生成" style="min-width:28px;padding:4px 8px">🎲</button>
+	    </span>
+
+    <div class="viz-stats-row">
+      <span>🔍 比较：<span class="viz-stat-val" id="statComparisons">0</span></span>
+      <span>🔀 交换：<span class="viz-stat-val" id="statSwaps">0</span></span>
+      <span>📍 步骤：<span class="viz-stat-val" id="statStep">0/0</span></span>
+      <span>🔄 轮次：<span class="viz-stat-val" id="statRound">0</span></span>
+    </div>
+  </div>
+</div>
+
+<!-- 步骤时间线 -->
+<div class="viz-timeline-wrap" style="max-width:1100px;margin:12px auto 0">
+  <div class="viz-section-label" style="padding:0 8px 6px">📋 步骤列表（点击跳转）</div>
+  <div class="viz-timeline" id="vizTimeline"></div>
+</div>
+
+<a href="{{ url_for('submit.submission_result', submission_id=submission.id) }}" class="btn-sm mt-3">← 返回结果</a>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// ============================================================
+// 全局状态
+// ============================================================
+let steps = [], cur = 0, timer = null, speed = 1200;
+let playing = false, stepMode = false, soundOn = false;
+let mode = 'replay';  // 'replay' | 'demo'
+let cmpCount = 0, swapCount = 0;  // 增量统计，updateStats O(1)
+let arraySize = 10;   // 默认 10 个元素
+let currentAlgo = '{{ submission.recognized_algo or "bubble" }}'.split('(')[0].trim().split('/')[0].trim();
+if (!currentAlgo || currentAlgo === 'unknown') currentAlgo = 'bubble';
+
+// 用户代码行（来自后端）
+const userCodeLines = {{ code_lines | tojson }};
+
+// 伪代码映射（演示模式用）
+const PSEUDO_MAP = {
+  bubble: [
+    'for i ← 0 to n-2',
+    '  for j ← 0 to n-i-2',
+    '    if arr[j] > arr[j+1]',
+    '      swap(arr[j], arr[j+1])',
+    '    end if',
+    '  end for',
+    '  // 末尾已就位 ✅',
+    'end for'
+  ],
+  select: [
+    'for i ← 0 to n-2',
+    '  minIdx ← i',
+    '  for j ← i+1 to n-1',
+    '    if arr[j] < arr[minIdx]',
+    '      minIdx ← j',
+    '  end for',
+    '  swap(arr[i], arr[minIdx])',
+    'end for'
+  ],
+  insert: [
+    'for i ← 1 to n-1',
+    '  key ← arr[i]',
+    '  j ← i - 1',
+    '  while j ≥ 0 and arr[j] > key',
+    '    arr[j+1] ← arr[j]',
+    '    j ← j - 1',
+    '  end while',
+    '  arr[j+1] ← key',
+    'end for'
+  ],
+  quick: [
+    'function quickSort(arr, lo, hi)',
+    '  if lo ≥ hi: return',
+    '  pivot ← partition(arr, lo, hi)',
+    '  quickSort(arr, lo, pivot-1)',
+    '  quickSort(arr, pivot+1, hi)',
+    'function partition(arr, lo, hi)',
+    '  pivot ← arr[hi]',
+    '  i ← lo - 1',
+    '  for j ← lo to hi-1',
+    '    if arr[j] ≤ pivot',
+    '      i ← i + 1',
+    '      swap(arr[i], arr[j])',
+    '  swap(arr[i+1], arr[hi])',
+    '  return i + 1'
+  ],
+  merge: [
+    'function mergeSort(arr)',
+    '  if len(arr) ≤ 1: return arr',
+    '  mid ← len(arr) // 2',
+    '  left ← mergeSort(arr[:mid])',
+    '  right ← mergeSort(arr[mid:])',
+    '  return merge(left, right)',
+    'function merge(left, right)',
+    '  result ← []',
+    '  while left and right',
+    '    if left[0] ≤ right[0]',
+    '      result.append(left.pop(0))',
+    '    else',
+    '      result.append(right.pop(0))',
+    '  result.extend(left + right)',
+    '  return result'
+  ],
+heap: [
+	    'function heapSort(arr)',
+	    '  for i ← n//2-1 downto 0',
+	    '    heapify(arr, n, i)',
+	    '  for i ← n-1 downto 0',
+	    '    swap(arr[0], arr[i])',
+	    '    heapify(arr, i, 0)',
+	    'function heapify(arr, n, i)',
+	    '  largest ← i',
+	    '  left ← 2*i + 1',
+	    '  right ← 2*i + 2',
+	    '  if left < n and arr[left] > arr[largest]',
+	    '    largest ← left',
+	    '  if right < n and arr[right] > arr[largest]',
+	    '    largest ← right',
+	    '  if largest ≠ i',
+	    '    swap(arr[i], arr[largest])',
+	    '    heapify(arr, n, largest)'
+	  ],
+	  stalin: [
+	    'function stalinSort(arr)',
+	    '  if len(arr) == 0: return []',
+	    '  result ← [arr[0]]',
+	    '  for x in arr[1:]',
+	    '    if x ≥ result[-1]',
+	    '      result.append(x)  // 保留 ✅',
+	    '    else',
+	    '      // 淘汰 ⛔（不操作）',
+	    '  return result'
+	  ],
+sleep: [
+		    'function sleepSort(arr)',
+		    '  // 每个元素按其值"睡眠"',
+		    '  // 值最小者最先醒来',
+		    '  return arr',
+		    '    .map(v => ({v, t: v}))',
+		    '    .sort((a,b) => a.t - b.t)',
+		    '    .map(x => x.v)',
+		    '  // 💤→✨ 醒来即就位'
+		  ],
+		  merciful_stalin: [
+		    'function mercifulStalinSort(arr)',
+	    '  if len(arr) ≤ 1: return arr',
+	    '  kept ← [arr[0]]',
+	    '  dropped ← []',
+	    '  for x in arr[1:]',
+	    '    if x ≥ kept[-1]',
+	    '      kept.append(x)',
+	    '    else',
+	    '      dropped.append(x)',
+	    '  sorted_dropped ← sort(dropped)',
+	    '  return merge(kept, sorted_dropped)'
+	  ]
+	};
+
+const ALGO_NAMES_ZH = {
+	  bubble: '冒泡排序', select: '选择排序', insert: '插入排序',
+	  quick: '快速排序', merge: '归并排序', heap: '堆排序',
+	  stalin: '斯大林排序', merciful_stalin: '仁慈斯大林排序', sleep: '💤 睡眠排序'
+	};
+
+// DOM 引用
+const barContainer = document.getElementById('vizBarContainer');
+const yAxisEl = document.getElementById('vizYAxis');
+const codeBlock = document.getElementById('vizCodeBlock');
+const descBox = document.getElementById('vizDescBox');
+const btnPlay = document.getElementById('btnPlay');
+const btnStep = document.getElementById('btnStep');
+const btnReset = document.getElementById('btnReset');
+const btnStepMode = document.getElementById('btnStepMode');
+const statComp = document.getElementById('statComparisons');
+const statSwap = document.getElementById('statSwaps');
+const statStep = document.getElementById('statStep');
+const statRound = document.getElementById('statRound');
+const speedBtns = document.querySelectorAll('.viz-btn-speed');
+const codeAlgoTag = document.getElementById('codeAlgoTag');
+const codePanelLabel = document.getElementById('codePanelLabel');
+
+// ============================================================
+// Y 轴构建
+// ============================================================
+function buildYAxis(maxVal) {
+  yAxisEl.innerHTML = '';
+  const step = Math.max(10, Math.ceil(maxVal / 10));
+  for (let v = 0; v <= maxVal; v += step) {
+    const tick = document.createElement('div');
+    tick.className = 'viz-y-tick';
+    tick.textContent = v;
+    yAxisEl.appendChild(tick);
+  }
+}
+
+// ============================================================
+// 语法高亮
+// ============================================================
+const PY_KEYWORDS = new Set([
+  'def', 'return', 'if', 'else', 'elif', 'for', 'while', 'in', 'range',
+  'len', 'and', 'or', 'not', 'break', 'continue', 'import', 'from',
+  'True', 'False', 'None', 'class', 'pass', 'with', 'as', 'try', 'except',
+  'finally', 'raise', 'yield', 'lambda', 'global', 'nonlocal', 'is',
+  'print', 'int', 'str', 'list', 'dict', 'set', 'tuple', 'float', 'bool'
+]);
+
+function highlightPythonCode(line) {
+  if (!line) return '';
+  // 先转义 HTML
+  let html = escHtml(line);
+  // 注释
+  html = html.replace(/(#.*)$/, '<span class="viz-code-comment">$1</span>');
+  // 字符串（单引号和双引号，简化处理）
+  html = html.replace(/(["'])(?:(?!\1|\\).|\\.)*\1/g,
+    '<span class="viz-code-string">$&</span>');
+  html = html.replace(/('''[\s\S]*?'''|"""[\s\S]*?""")/g,
+    '<span class="viz-code-string">$&</span>');
+  // 数字
+  html = html.replace(/\b(\d+\.?\d*)\b/g,
+    '<span class="viz-code-number">$1</span>');
+  // 关键字和标识符（避开已标记的 span）
+  html = html.replace(/(?<!<span[^>]*>)(?<!["'\w])\b([a-zA-Z_]\w*)\b(?!<\/span>)(?![^<]*<\/span>)/g,
+    function(match, word) {
+      if (PY_KEYWORDS.has(word)) return '<span class="viz-code-keyword">' + word + '</span>';
+      // 简单的函数调用检测：后面跟着 (
+      return '<span class="viz-code-var">' + word + '</span>';
+    });
+  return html;
+}
+
+function renderCodeLines(lines, highlightIdx) {
+  codeBlock.innerHTML = lines.map((line, idx) => {
+    const cls = (idx === highlightIdx) ? 'viz-code-line highlight' : 'viz-code-line';
+    return '<div class="' + cls + '" data-line="' + idx + '">' + highlightPythonCode(line) + '</div>';
+  }).join('');
+}
+
+function highlightCodeLine(lineIdx) {
+  const allLines = codeBlock.querySelectorAll('.viz-code-line');
+  allLines.forEach(l => l.classList.remove('highlight'));
+  if (lineIdx !== null && lineIdx !== undefined && lineIdx >= 0) {
+    const el = codeBlock.querySelector('[data-line="' + lineIdx + '"]');
+    if (el) el.classList.add('highlight');
+  }
+}
+
+// ============================================================
+// 柱状图渲染
+// ============================================================
+function getHeight(v, maxVal) {
+  return Math.max((v / maxVal) * 100, 2) + '%';
+}
+
+function buildChart(arr, maxVal) {
+  barContainer.innerHTML = '';
+  arr.forEach((val, i) => {
+    const w = document.createElement('div');
+    w.className = 'viz-bar-wrapper';
+    w.dataset.index = i;
+    w.innerHTML =
+      '<div class="viz-bar-val">' + val + '</div>' +
+      '<div class="viz-bar-pillar default" style="height:' + getHeight(val, maxVal) + '"></div>' +
+      '<div class="viz-bar-idx">[' + i + ']</div>';
+    barContainer.appendChild(w);
+  });
+}
+
+function applyStep(idx) {
+  if (idx < 0 || idx >= steps.length) return;
+  cur = idx;
+  const s = steps[idx];
+  const maxVal = Math.max(...s.array_state, 1);
+  const wrappers = barContainer.querySelectorAll('.viz-bar-wrapper');
+
+  // 如果图表为空或数量不匹配则重建
+  if (wrappers.length !== s.array_state.length) {
+    buildYAxis(maxVal);
+    buildChart(s.array_state, maxVal);
+    // 重建后重新获取引用
+    return applyStepAfterRebuild(idx);
+  }
+
+  const compSet = new Set((s.op === 'compare') ? [s.i, s.j].filter(x => x != null) : []);
+  const swapSet = new Set(s.op === 'swap' ? [s.i, s.j].filter(x => x != null) : []);
+  const elimSet = new Set(s.op === 'eliminate' ? [s.i].filter(x => x != null) : []);
+    const wakeSet = new Set(s.op === 'wake' ? [s.i].filter(x => x != null) : []);
+    const isSleep = s.op === 'sleep';
+    const isDone = s.op === 'done';
+    // 睡眠状态：所有柱子添加呼吸脉冲
+    if (isSleep) { wrappers.forEach(function(w) { w.querySelector('.viz-bar-pillar').classList.add('sleeping'); }); }
+
+  // 更新非交换柱子
+  wrappers.forEach((w, i) => {
+    if (swapSet.has(i)) return;
+      // null 值 -> 柱子已湮灭/已醒来，高度归零
+      if (val === null || val === undefined) {
+        w.querySelector('.viz-bar-pillar').style.height = '0px';
+        w.querySelector('.viz-bar-val').textContent = '';
+        w.querySelector('.viz-bar-pillar').className = 'viz-bar-pillar';
+        w.querySelector('.viz-bar-idx').className = 'viz-bar-idx';
+        return;
+      }
+    const val = s.array_state[i];
+    const valLabel = w.querySelector('.viz-bar-val');
+    const pillar = w.querySelector('.viz-bar-pillar');
+    const idxLabel = w.querySelector('.viz-bar-idx');
+    valLabel.textContent = val;
+    pillar.style.height = getHeight(val, maxVal);
+    pillar.className = 'viz-bar-pillar';
+    idxLabel.className = 'viz-bar-idx';
+if (isDone) { pillar.classList.add('sorted'); idxLabel.classList.add('sorted'); }
+	    else if (compSet.has(i)) { pillar.classList.add('comparing'); idxLabel.classList.add('comparing'); }
+	    else if (elimSet.has(i)) { pillar.classList.add('swapping'); idxLabel.classList.add('comparing'); }
+	    else if (wakeSet.has(i)) { pillar.classList.add('waking'); idxLabel.classList.add('comparing'); }
+	    else pillar.classList.add('default');
+    // 消除/唤醒粒子特效
+      if (s.op === 'eliminate' && s.i != null && i === s.i) { triggerParticleBurst(w, 'annihilate'); }
+      if (s.op === 'wake' && s.i != null && i === s.i) { triggerParticleBurst(w, 'wake'); }
+      w.style.transform = '';
+  });
+
+  // 处理交换（横向平移动画）
+  if (s.op === 'swap' && s.i != null && s.j != null) {
+    const i1 = s.i, i2 = s.j;
+    const w1 = wrappers[i1];
+    const w2 = wrappers[i2];
+    if (!w1 || !w2) return;
+    const r1 = w1.getBoundingClientRect();
+    const r2 = w2.getBoundingClientRect();
+    const dx = r2.left - r1.left;
+
+    w1.style.transition = 'transform 0.4s cubic-bezier(0.25,0.8,0.25,1.2)';
+    w2.style.transition = 'transform 0.4s cubic-bezier(0.25,0.8,0.25,1.2)';
+    w1.style.transform = 'translateX(' + dx + 'px)';
+    w2.style.transform = 'translateX(' + (-dx) + 'px)';
+
+    w1.querySelector('.viz-bar-pillar').className = 'viz-bar-pillar swapping';
+    w2.querySelector('.viz-bar-pillar').className = 'viz-bar-pillar swapping';
+
+    const onEnd = function() {
+      w1.removeEventListener('transitionend', onEnd);
+      // 禁用过渡
+      const p1 = w1.querySelector('.viz-bar-pillar');
+      const p2 = w2.querySelector('.viz-bar-pillar');
+      p1.style.transition = 'none';
+      p2.style.transition = 'none';
+      w1.style.transition = 'none';
+      w2.style.transition = 'none';
+
+      // 更新数值
+      const val1 = s.array_state[i1];
+      const val2 = s.array_state[i2];
+      w1.querySelector('.viz-bar-val').textContent = val1;
+      w2.querySelector('.viz-bar-val').textContent = val2;
+      p1.style.height = getHeight(val1, maxVal);
+      p2.style.height = getHeight(val2, maxVal);
+
+      // 归位
+      w1.style.transform = '';
+      w2.style.transform = '';
+
+      // 强制重排后恢复过渡
+      void w1.offsetHeight;
+      p1.style.transition = '';
+      p2.style.transition = '';
+      w1.style.transition = '';
+      w2.style.transition = '';
+    };
+    w1.addEventListener('transitionend', onEnd, { once: true });
+  }
+
+  // 更新代码行高亮
+  const hlLine = s.highlight_line != null ? s.highlight_line - 1 : (function() {
+    // 回退：基于 op 映射
+const fallbackMap = {
+	      'init': 0,
+	      'compare': (currentAlgo === 'insert' ? 3 : currentAlgo === 'select' ? 3 : currentAlgo === 'quick' ? 9 : currentAlgo === 'merge' ? 9 : currentAlgo === 'stalin' ? 4 : currentAlgo === 'merciful_stalin' ? 7 : 2),
+	      'swap': (currentAlgo === 'insert' ? 5 : currentAlgo === 'select' ? 6 : currentAlgo === 'heap' ? 6 : 3),
+'set': (currentAlgo === 'insert' ? 5 : currentAlgo === 'stalin' ? 5 : currentAlgo === 'merciful_stalin' ? 8 : 4),
+		      'eliminate': 5,
+		      'sleep': 0,
+		      'wake': 4,
+		      'done': 99
+	    };
+    return fallbackMap[s.op] || 0;
+  })();
+  highlightCodeLine(hlLine);
+
+  // 更新描述
+  descBox.innerHTML = '📋 ' + (s.note || '');
+  statStep.textContent = (cur + 1) + '/' + steps.length;
+  statRound.textContent = s.round || 0;
+
+  renderTimeline();
+}
+
+function applyStepAfterRebuild(idx) {
+  // 重建后的简化应用（柱子刚重建，reference 正确，无需处理 swap 动画）
+  if (idx < 0 || idx >= steps.length) return;
+  cur = idx;
+  const s = steps[idx];
+  updateStats(false);
+  const hlLine = s.highlight_line != null ? s.highlight_line - 1 : 0;
+  highlightCodeLine(hlLine);
+  descBox.innerHTML = '📋 ' + (s.note || '');
+  statStep.textContent = (cur + 1) + '/' + steps.length;
+  statRound.textContent = s.round || 0;
+  renderTimeline();
+}
+
+// ============================================================
+// 统计
+// ============================================================
+function updateStats(incremental = true) {
+  if (incremental && cur >= 0 && cur < steps.length) {
+    // 增量模式：仅统计当前步（前向播放时 O(1)）
+    const s = steps[cur];
+    if (s) {
+      if (s.op === 'compare') cmpCount++;
+      else if (s.op === 'swap') swapCount++;
+    }
+  } else {
+    // 全量模式：跳转/回退时重新统计
+    let cmp = 0, swp = 0;
+    for (let k = 0; k <= cur && k < steps.length; k++) {
+      if (steps[k].op === 'compare') cmp++;
+      else if (steps[k].op === 'swap') swp++;
+    }
+    cmpCount = cmp; swapCount = swp;
+  }
+  statComp.textContent = cmpCount;
+  statSwap.textContent = swapCount;
+}
+
+// ============================================================
+// 时间线
+// ============================================================
+function renderTimeline() {
+  const tl = document.getElementById('vizTimeline');
+  if (!steps.length) { tl.innerHTML = '<span style="color:var(--muted);padding:8px">暂无步骤</span>'; return; }
+
+  const maxShow = 80;
+  const skip = steps.length > maxShow ? Math.ceil(steps.length / maxShow) : 1;
+
+  let html = '';
+  for (let k = 0; k < steps.length; k += skip) {
+    const s = steps[k];
+    const icons = { init: '🟢', compare: '🔍', swap: '🔀', set: '📝', done: '✅', error: '❌', warning: '⚠️' };
+    const icon = icons[s.op] || '⚪';
+    const active = k === cur ? ' active' : '';
+    html += '<div class="viz-step-chip' + active + '" onclick="jumpTo(' + k + ')" title="步骤 ' + k + ': ' + escHtml(s.op) + '">' +
+      icon + '<span class="chip-num">' + k + '</span></div>';
+  }
+  tl.innerHTML = html;
+}
+
+// ============================================================
+// 播放控制
+// ============================================================
+function stop() {
+  if (timer) { clearTimeout(timer); timer = null; }
+  playing = false;
+  btnPlay.textContent = '▶ 开始';
+  btnPlay.classList.remove('paused');
+}
+
+function play() {
+  if (playing) return;
+  if (cur >= steps.length - 1) reset();
+  playing = true;
+  btnPlay.textContent = '⏸ 暂停';
+  btnPlay.classList.add('paused');
+  advance();
+}
+
+function pause() {
+  stop();
+  btnPlay.textContent = '▶ 继续';
+}
+
+function advance() {
+  if (!playing) return;
+  if (cur >= steps.length - 1) {
+    stop();
+    btnPlay.textContent = '🔄 重新播放';
+    return;
+  }
+  updateStats(true);
+  applyStep(cur + 1);
+  timer = setTimeout(function() { advance(); }, speed);
+}
+
+function stepForward() {
+  if (playing) pause();
+  if (cur < steps.length - 1) { updateStats(true); applyStep(cur + 1); }
+  if (cur >= steps.length - 1) btnPlay.textContent = '🔄 重新播放';
+}
+
+function jumpTo(idx) {
+  const wasPlaying = playing;
+  if (playing) pause();
+  cur = Math.max(0, Math.min(idx, steps.length - 1));
+  updateStats(false);  // 跳转时全量重新统计
+  applyStep(cur);
+  if (wasPlaying) play();
+}
+
+function reset() {
+  stop();
+  cur = -1;
+  if (steps.length > 0) {
+    const s0 = steps[0];
+    const maxVal = Math.max(...s0.array_state, 1);
+    buildYAxis(maxVal);
+    buildChart(s0.array_state, maxVal);
+    highlightCodeLine(-1);
+    descBox.innerHTML = '👋 欢迎！数组：' + JSON.stringify(s0.array_state);
+  }
+  statComp.textContent = '0';
+  statSwap.textContent = '0';
+  cmpCount = 0;
+  swapCount = 0;
+  statStep.textContent = '0/' + steps.length;
+  statRound.textContent = '0';
+  btnPlay.textContent = '▶ 开始';
+  btnPlay.classList.remove('paused');
+  renderTimeline();
+}
+
+function setSpeed(ms, btn) {
+  speed = ms;
+  speedBtns.forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  if (playing) { stop(); playing = true; btnPlay.textContent = '⏸ 暂停'; btnPlay.classList.add('paused'); advance(); }
+}
+
+function toggleStepMode() {
+  stepMode = !stepMode;
+  btnStepMode.classList.toggle('active', stepMode);
+  btnStepMode.textContent = stepMode ? '📋 单步模式 (开)' : '📋 单步模式';
+  if (stepMode && playing) pause();
+}
+
+// ============================================================
+// 数据源切换
+// ============================================================
+function switchDataSource() {
+  mode = document.getElementById('dataSource').value;
+  document.getElementById('algoSelect').style.display = mode === 'demo' ? 'inline-block' : 'none';
+  document.getElementById('demoInputWrap').style.display = mode === 'demo' ? 'inline' : 'none';
+  document.getElementById('replayDetailWrap').style.display = mode === 'replay' ? 'inline' : 'none';
+
+  if (timer) { clearTimeout(timer); timer = null; btnPlay.textContent = '▶ 开始'; playing = false; }
+
+  if (mode === 'replay') {
+    codePanelLabel.textContent = '💻 你的代码';
+    codeAlgoTag.style.display = 'inline';
+    codeAlgoTag.textContent = '{{ submission.recognized_algo or "" }}';
+    renderCodeLines(userCodeLines, -1);
+    loadReplaySteps();
+  } else {
+    codePanelLabel.textContent = '📜 伪代码';
+    codeAlgoTag.style.display = 'inline';
+    currentAlgo = document.getElementById('algoSelect').value;
+    codeAlgoTag.textContent = ALGO_NAMES_ZH[currentAlgo] || currentAlgo;
+    renderPseudoCode(currentAlgo);
+    genDemoSteps();
+  }
+}
+
+function switchAlgo() {
+  currentAlgo = document.getElementById('algoSelect').value;
+  codeAlgoTag.textContent = ALGO_NAMES_ZH[currentAlgo] || currentAlgo;
+  renderPseudoCode(currentAlgo);
+  genDemoSteps();
+}
+
+// ============================================================
+// 伪代码渲染（演示模式）
+// ============================================================
+function renderPseudoCode(algo) {
+  const lines = PSEUDO_MAP[algo] || PSEUDO_MAP['bubble'];
+  codeBlock.innerHTML = lines.map(function(line, idx) {
+    return '<div class="viz-code-line" data-line="' + idx + '">' +
+      '<span class="viz-code-keyword">' + escHtml(line) + '</span></div>';
+  }).join('');
+}
+
+// ============================================================
+// 回放模式：从后端加载步骤
+// ============================================================
+function loadReplaySteps() {
+  const did = document.getElementById('detailSelect').value;
+  if (!did) return;
+  fetch('/submit/api/steps/' + did)
+    .then(function(r) { if (!r.ok) throw Error('fail'); return r.json(); })
+    .then(function(data) {
+      steps = data;
+      cur = -1;
+      if (steps.length > 0) {
+        renderCodeLines(userCodeLines, -1);
+        reset();
+      } else {
+        descBox.innerHTML = '⚠️ 无步骤数据';
+      }
+    })
+    .catch(function() {
+      descBox.innerHTML = '⚠️ 加载失败，请重试';
+    });
+}
+
+// ============================================================
+// 演示模式：6 种算法 JS 生成器
+// ============================================================
+function setArraySize(size, btn) {
+	  arraySize = size;
+	  document.querySelectorAll('#demoInputWrap .viz-btn-speed').forEach(function(b) { b.classList.remove('active'); });
+	  btn.classList.add('active');
+	  randomInput();
+	}
+	
+	function randomInput() {
+	  const n = arraySize || 10;
+	  const arr = [];
+	  for (let i = 0; i < n; i++) arr.push(Math.floor(Math.random() * 99) + 1);
+	  document.getElementById('demoInput').value = arr.join(',');
+	  genDemoSteps();
+	}
+
+function genDemoSteps() {
+  if (timer) { clearTimeout(timer); timer = null; btnPlay.textContent = '▶ 开始'; playing = false; }
+
+  const raw = document.getElementById('demoInput').value.trim();
+  const arr = raw.split(',').map(Number).filter(function(v) { return !isNaN(v); });
+  if (!arr.length) { steps = []; reset(); return; }
+
+  const algo = currentAlgo || 'bubble';
+  const genFn = ALGO_GENERATORS[algo];
+  if (!genFn) { steps = []; reset(); return; }
+
+  steps = Array.from(genFn([...arr]));
+  // 为 demo 步骤添加 highlight_line 映射
+  const pseudoLineMap = {
+    bubble: { outer_loop: 0, compare: 2, swap: 3, done: 7, round_start: 1 },
+    select: { outer_loop: 0, compare: 3, swap: 6, done: 7 },
+    insert: { outer_loop: 0, compare: 4, swap: 5, set: 7, done: 8 },
+    quick: { outer_loop: 8, compare: 9, swap: 10, done: 13 },
+    merge: { outer_loop: 8, compare: 9, swap: 10, set: 11, done: 13 },
+heap: { outer_loop: 1, compare: 9, swap: 12, done: 3 },
+	    stalin: { outer_loop: 3, compare: 4, swap: 5, set: 5, eliminate: 5, done: 8 },
+	    merciful_stalin: { outer_loop: 6, compare: 7, swap: 8, set: 8, done: 12 },
+	    sleep: { outer_loop: 2, compare: 3, wake: 4, done: 7 }
+	  };
+	  const pm = pseudoLineMap[algo] || pseudoLineMap['bubble'];
+
+  steps.forEach(function(s) {
+    if (s.op === 'init') s.highlight_line = pm.outer_loop;
+    else if (s.op === 'compare') s.highlight_line = pm.compare;
+    else if (s.op === 'swap') s.highlight_line = pm.swap;
+else if (s.op === 'set') s.highlight_line = pm.set || pm.compare;
+	    else if (s.op === 'eliminate') s.highlight_line = pm.eliminate || pm.compare;
+	    else if (s.op === 'wake') s.highlight_line = pm.wake || pm.compare;
+	    else if (s.op === 'sleep') s.highlight_line = pm.outer_loop;
+	    else if (s.op === 'done') s.highlight_line = pm.done;
+    else s.highlight_line = null;
+    // round 已在生成器中设置
+  });
+
+  cur = -1;
+  reset();
+}
+
+// ---- 6 种算法 JS Generator（与 Python algo_simulators.py 一致）----
+const ALGO_GENERATORS = {
+  *bubble(arr) {
+    const n = arr.length;
+    yield { seq: 0, array_state: [...arr], op: 'init', i: null, j: null, note: '初始状态：数组包含 ' + n + ' 个元素，全部未排序。', round: 0 };
+    for (let i = 0; i < n - 1; i++) {
+      const r = i + 1;
+      yield { seq: 0, array_state: [...arr], op: 'compare', i: null, j: null, note: '🔄 第 ' + r + ' 轮开始', round: r };
+      for (let j = 0; j < n - 1 - i; j++) {
+        yield { seq: 0, array_state: [...arr], op: 'compare', i: j, j: j + 1, note: '🔍 比较 arr[' + j + ']=' + arr[j] + ' 与 arr[' + (j + 1) + ']=' + arr[j + 1], round: r };
+        if (arr[j] > arr[j + 1]) {
+          [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+          yield { seq: 0, array_state: [...arr], op: 'swap', i: j, j: j + 1, swap: [j, j + 1], note: '🔀 交换 arr[' + j + '] 与 arr[' + (j + 1) + ']', round: r };
+        } else {
+          yield { seq: 0, array_state: [...arr], op: 'compare', i: j, j: j + 1, note: '✓ 无需交换', round: r };
+        }
+      }
+      yield { seq: 0, array_state: [...arr], op: 'set', i: null, j: null, note: '🏁 第 ' + r + ' 轮结束：arr[' + (n - i - 1) + ']=' + arr[n - i - 1] + ' 已就位', round: r };
+    }
+    yield { seq: 0, array_state: [...arr], op: 'done', i: null, j: null, note: '🎉 排序完成！', round: n - 1 };
+  },
+
+  *select(arr) {
+    const n = arr.length;
+    yield { seq: 0, array_state: [...arr], op: 'init', i: null, j: null, note: '初始状态：数组包含 ' + n + ' 个元素。', round: 0 };
+    for (let i = 0; i < n - 1; i++) {
+      const r = i + 1;
+      let minIdx = i;
+      yield { seq: 0, array_state: [...arr], op: 'compare', i: i, j: null, note: '🔄 第 ' + r + ' 轮：设 min_idx = ' + i, round: r };
+      for (let j = i + 1; j < n; j++) {
+        yield { seq: 0, array_state: [...arr], op: 'compare', i: minIdx, j: j, note: '🔍 比较 arr[' + minIdx + ']=' + arr[minIdx] + ' 与 arr[' + j + ']=' + arr[j], round: r };
+        if (arr[j] < arr[minIdx]) { minIdx = j; }
+      }
+      if (minIdx !== i) {
+        [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]];
+        yield { seq: 0, array_state: [...arr], op: 'swap', i: i, j: minIdx, swap: [i, minIdx], note: '🔀 将最小值 arr[' + i + ']=' + arr[i] + ' 交换到位置 ' + i, round: r };
+      } else {
+        yield { seq: 0, array_state: [...arr], op: 'set', i: i, j: null, note: '✓ arr[' + i + '] 已在正确位置', round: r };
+      }
+    }
+    yield { seq: 0, array_state: [...arr], op: 'done', i: null, j: null, note: '🎉 排序完成！', round: n - 1 };
+  },
+
+  *insert(arr) {
+    const n = arr.length;
+    yield { seq: 0, array_state: [...arr], op: 'init', i: null, j: null, note: '初始状态：数组包含 ' + n + ' 个元素。', round: 0 };
+    for (let i = 1; i < n; i++) {
+      const r = i;
+      const key = arr[i];
+      let j = i - 1;
+      yield { seq: 0, array_state: [...arr], op: 'compare', i: i, j: null, note: '🔄 第 ' + r + ' 轮：取出 key = arr[' + i + '] = ' + key, round: r };
+      while (j >= 0 && arr[j] > key) {
+        yield { seq: 0, array_state: [...arr], op: 'compare', i: j, j: j + 1, note: '🔍 比较 arr[' + j + ']=' + arr[j] + ' 与 key=' + key + ' → 需要后移', round: r };
+        arr[j + 1] = arr[j];
+        yield { seq: 0, array_state: [...arr], op: 'set', i: j + 1, j: null, note: '📝 arr[' + (j + 1) + '] = arr[' + j + '] = ' + arr[j], round: r };
+        j--;
+      }
+      if (j >= 0) {
+        yield { seq: 0, array_state: [...arr], op: 'compare', i: j, j: j + 1, note: '🔍 arr[' + j + ']=' + arr[j] + ' ≤ key=' + key + ' → 停止', round: r };
+      }
+      arr[j + 1] = key;
+      yield { seq: 0, array_state: [...arr], op: 'set', i: j + 1, j: null, note: '📝 arr[' + (j + 1) + '] = key = ' + key, round: r };
+    }
+    yield { seq: 0, array_state: [...arr], op: 'done', i: null, j: null, note: '🎉 排序完成！', round: n };
+  },
+
+  *quick(arr) {
+    function* _qs(a, lo, hi, roundBase) {
+      if (lo >= hi) return;
+      const pivot = a[hi];
+      let i = lo - 1;
+      for (let j = lo; j < hi; j++) {
+        yield { seq: 0, array_state: [...a], op: 'compare', i: j, j: hi, note: '🔍 比较 arr[' + j + ']=' + a[j] + ' 与 pivot arr[' + hi + ']=' + pivot, round: roundBase + j };
+        if (a[j] <= pivot) {
+          i++;
+          if (i !== j) {
+            [a[i], a[j]] = [a[j], a[i]];
+            yield { seq: 0, array_state: [...a], op: 'swap', i: i, j: j, swap: [i, j], note: '🔀 交换 arr[' + i + '] ↔ arr[' + j + ']', round: roundBase + j };
+          }
+        }
+      }
+      [a[i + 1], a[hi]] = [a[hi], a[i + 1]];
+      yield { seq: 0, array_state: [...a], op: 'swap', i: i + 1, j: hi, swap: [i + 1, hi], note: '📌 将 pivot=' + pivot + ' 放到正确位置 arr[' + (i + 1) + ']', round: roundBase + hi };
+      yield* _qs(a, lo, i, roundBase + 100);
+      yield* _qs(a, i + 2, hi, roundBase + 200);
+    }
+    yield { seq: 0, array_state: [...arr], op: 'init', i: null, j: null, note: '初始状态：快速排序开始（递归分区）。', round: 0 };
+    yield* _qs(arr, 0, arr.length - 1, 0);
+    yield { seq: 0, array_state: [...arr], op: 'done', i: null, j: null, note: '🎉 排序完成！', round: 99 };
+  },
+
+  *merge(arr) {
+    yield { seq: 0, array_state: [...arr], op: 'init', i: null, j: null, note: '初始状态：归并排序开始（分解 + 合并）。', round: 0 };
+
+    function* _ms(a, lo, hi, depth) {
+      if (lo >= hi) return;
+      const mid = Math.floor((lo + hi) / 2);
+      yield* _ms(a, lo, mid, depth + 1);
+      yield* _ms(a, mid + 1, hi, depth + 1);
+
+      const left = a.slice(lo, mid + 1), right = a.slice(mid + 1, hi + 1);
+      let k = lo, li = 0, ri = 0;
+while (li < left.length && ri < right.length) {
+	        // 构造修正后的数组副本：a[lo+li] / a[mid+1+ri] 可能已被之前的合并写覆盖
+	        const cmpArr = [...a];
+	        if (lo + li < cmpArr.length) cmpArr[lo + li] = left[li];
+	        if (mid + 1 + ri < cmpArr.length) cmpArr[mid + 1 + ri] = right[ri];
+	        yield { seq: 0, array_state: cmpArr, op: 'compare', i: lo + li, j: mid + 1 + ri, note: '🔍 比较 left[' + li + ']=' + left[li] + ' 与 right[' + ri + ']=' + right[ri], round: depth };
+	        if (left[li] <= right[ri]) {
+          a[k] = left[li];
+          yield { seq: 0, array_state: [...a], op: 'set', i: k, j: null, note: '📝 arr[' + k + '] = left[' + li + '] = ' + left[li], round: depth };
+          li++;
+        } else {
+          a[k] = right[ri];
+          yield { seq: 0, array_state: [...a], op: 'set', i: k, j: null, note: '📝 arr[' + k + '] = right[' + ri + '] = ' + right[ri], round: depth };
+          ri++;
+        }
+        k++;
+      }
+      while (li < left.length) {
+        a[k] = left[li];
+        yield { seq: 0, array_state: [...a], op: 'set', i: k, j: null, note: '📝 arr[' + k + '] = left[' + li + '] = ' + left[li], round: depth };
+        li++; k++;
+      }
+      while (ri < right.length) {
+        a[k] = right[ri];
+        yield { seq: 0, array_state: [...a], op: 'set', i: k, j: null, note: '📝 arr[' + k + '] = right[' + ri + '] = ' + right[ri], round: depth };
+        ri++; k++;
+      }
+    }
+
+    yield* _ms(arr, 0, arr.length - 1, 0);
+    yield { seq: 0, array_state: [...arr], op: 'done', i: null, j: null, note: '🎉 排序完成！', round: 99 };
+  },
+
+  *heap(arr) {
+    const n = arr.length;
+    yield { seq: 0, array_state: [...arr], op: 'init', i: null, j: null, note: '初始状态：堆排序开始（建堆 + 排序）。', round: 0 };
+
+    function* _heapify(a, size, root, depth) {
+      let largest = root, left = 2 * root + 1, right = 2 * root + 2;
+      if (left < size) {
+        yield { seq: 0, array_state: [...a], op: 'compare', i: largest, j: left, note: '🔍 比较 arr[' + largest + ']=' + a[largest] + ' 与 arr[' + left + ']=' + a[left], round: depth };
+        if (a[left] > a[largest]) largest = left;
+      }
+      if (right < size) {
+        yield { seq: 0, array_state: [...a], op: 'compare', i: largest, j: right, note: '🔍 比较 arr[' + largest + ']=' + a[largest] + ' 与 arr[' + right + ']=' + a[right], round: depth };
+        if (a[right] > a[largest]) largest = right;
+      }
+      if (largest !== root) {
+        [a[root], a[largest]] = [a[largest], a[root]];
+        yield { seq: 0, array_state: [...a], op: 'swap', i: root, j: largest, swap: [root, largest], note: '🔀 交换 arr[' + root + '] ↔ arr[' + largest + ']', round: depth };
+        yield* _heapify(a, size, largest, depth + 1);
+      }
+    }
+
+    for (let i = Math.floor(n / 2) - 1; i >= 0; i--) { yield* _heapify(arr, n, i, 0); }
+    for (let i = n - 1; i > 0; i--) {
+      [arr[0], arr[i]] = [arr[i], arr[0]];
+      yield { seq: 0, array_state: [...arr], op: 'swap', i: 0, j: i, swap: [0, i], note: '🔀 将堆顶 arr[0]=' + arr[i] + ' 放到位置 ' + i, round: n - i };
+      yield* _heapify(arr, i, 0, n - i + 1);
+    }
+yield { seq: 0, array_state: [...arr], op: 'done', i: null, j: null, note: '🎉 排序完成！', round: n };
+	  },
+
+	  // ── 斯大林排序 ──
+	  *stalin(arr) {
+	    const n = arr.length;
+	    yield { seq: 0, array_state: [...arr], op: 'init', i: null, j: null, note: '初始状态：斯大林排序 — 遍历数组，淘汰破坏升序的元素。共 ' + n + ' 个元素。', round: 0 };
+	    if (n === 0) {
+	      yield { seq: 0, array_state: [...arr], op: 'done', i: null, j: null, note: '🎉 空数组，排序完成！', round: 0 };
+	      return;
+	    }
+	    const result = [arr[0]];
+	    let working = [...arr];
+	    yield { seq: 0, array_state: [...working], op: 'set', i: 0, j: null, note: '📌 保留 arr[0]=' + arr[0] + ' 作为起点', round: 1 };
+	    for (let idx = 1; idx < n; idx++) {
+	      const r = idx + 1;
+	      const x = arr[idx];
+	      const last = result[result.length - 1];
+	      yield { seq: 0, array_state: [...working], op: 'compare', i: idx, j: result.length - 1, note: '🔍 比较 arr[' + idx + ']=' + x + ' 与 result[-1]=' + last, round: r };
+	      if (x >= last) {
+	        result.push(x);
+	        working = [...result, ...arr.slice(result.length)];
+	        yield { seq: 0, array_state: [...working], op: 'set', i: result.length - 1, j: null, note: '✅ 保留 arr[' + idx + ']=' + x + '（≥ ' + last + '）', round: r };
+	      } else {
+	        working[idx] = null; yield { seq: 0, array_state: [...working], op: 'eliminate', i: idx, j: null, note: '💥 枪毙 arr[' + idx + ']=' + x + '（< ' + last + '）⛔', round: r };
+	      }
+	    }
+	    const final = [...result];
+	    yield { seq: 0, array_state: final, op: 'done', i: null, j: null, note: '🎉 斯大林排序完成！保留 ' + result.length + '/' + n + ' 个元素：' + JSON.stringify(final), round: n };
+	  },
+
+	  // ── 仁慈的斯大林排序 ──
+	  *merciful_stalin(arr) {
+	    const n = arr.length;
+	    yield { seq: 0, array_state: [...arr], op: 'init', i: null, j: null, note: '初始状态：仁慈斯大林排序 — 递归分解 + 归并。共 ' + n + ' 个元素。', round: 0 };
+
+	    const sortFunc = function*(a, depth) {
+	      if (a.length <= 1) return;
+	      const kept = [a[0]];
+	      const dropped = [];
+	      const working = [...a];
+	      yield { seq: 0, array_state: [...working], op: 'set', i: 0, j: null, note: '📌 第 ' + (depth + 1) + ' 层：保留 arr[0]=' + a[0], round: depth };
+	      for (let idx = 1; idx < a.length; idx++) {
+	        const x = a[idx];
+	        const last = kept[kept.length - 1];
+	        yield { seq: 0, array_state: [...working], op: 'compare', i: idx, j: kept.length - 1, note: '🔍 第 ' + (depth + 1) + ' 层：比较 arr[' + idx + ']=' + x + ' 与 kept[-1]=' + last, round: depth };
+	        if (x >= last) {
+	          kept.push(x);
+	          yield { seq: 0, array_state: [...working], op: 'set', i: idx, j: null, note: '✅ 保留 arr[' + idx + ']=' + x, round: depth };
+	        } else {
+	          dropped.push(x);
+	          yield { seq: 0, array_state: [...working], op: 'compare', i: idx, j: null, note: '📦 暂存 arr[' + idx + ']=' + x + ' 到淘汰列表（共 ' + dropped.length + ' 个）', round: depth };
+	        }
+	      }
+	      if (dropped.length > 0) {
+	        yield* sortFunc(dropped, depth + 1);
+	        const merged = [...kept, ...dropped].sort(function(a,b){return a-b;});
+	        yield { seq: 0, array_state: merged, op: 'done', i: null, j: null, note: '🔗 第 ' + (depth + 1) + ' 层归并完成：' + JSON.stringify(merged), round: depth };
+	      }
+	    };
+
+	    yield* sortFunc([...arr], 0);
+	    const final = [...arr].sort(function(a,b){return a-b;});
+yield { seq: 0, array_state: final, op: 'done', i: null, j: null, note: '🎉 仁慈斯大林排序完成！全部 ' + n + ' 个元素正确排序：' + JSON.stringify(final), round: 99 };
+		  },
+
+		  // ── 睡眠排序 ──
+		  *sleep(arr) {
+		    const n = arr.length;
+		    yield { seq: 0, array_state: [...arr], op: 'init', i: null, j: null, note: '💤 初始状态：睡眠排序 — 全部 ' + n + ' 个元素进入睡眠，按其值倒计时。共 ' + n + ' 个元素。', round: 0 };
+		    if (n === 0) {
+		      yield { seq: 0, array_state: [...arr], op: 'done', i: null, j: null, note: '🎉 空数组，排序完成！', round: 0 };
+		      return;
+		    }
+		    // 按值升序确定醒来顺序
+		    const pairs = arr.map(function(v, i) { return { origIdx: i, val: v }; });
+		    pairs.sort(function(a, b) { return a.val - b.val; });
+		    const working = [...arr];
+		    yield { seq: 0, array_state: [...working], op: 'sleep', i: null, j: null, note: '💤 全部 ' + n + ' 个元素正在睡眠中，最小值的元素将最先醒来…', round: 0 };
+		    for (let rank = 0; rank < n; rank++) {
+		      const r = rank + 1;
+		      const origIdx = pairs[rank].origIdx;
+		      const val = pairs[rank].val;
+		      yield { seq: 0, array_state: [...working], op: 'compare', i: origIdx, j: null, note: '⏳ 第 ' + r + ' 个醒来：arr[' + origIdx + ']=' + val + ' 计时器归零，正在唤醒…', round: r };
+		      working[origIdx] = null;
+		      yield { seq: 0, array_state: [...working], op: 'wake', i: origIdx, j: null, note: '✨ arr[' + origIdx + ']=' + val + ' 醒来！第 ' + r + '/' + n + ' 个元素就位', round: r };
+		    }
+		    const final = pairs.map(function(p) { return p.val; });
+		    yield { seq: 0, array_state: final, op: 'done', i: null, j: null, note: '🎉 睡眠排序完成！全部 ' + n + ' 个元素按值从小到大依次醒来：' + JSON.stringify(final), round: n };
+		  }
+		};
+
+// ============================================================
+// 粒子特效引擎
+// ============================================================
+
+function triggerParticleBurst(wrapper, type) {
+  const pillar = wrapper.querySelector('.viz-bar-pillar');
+  const rect = wrapper.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  const chartRect = wrapper.closest('.viz-bar-chart-outer').getBoundingClientRect();
+  const relX = cx - chartRect.left;
+  const relY = cy - chartRect.top;
+
+  const config = type === 'annihilate' ? {
+    colors: ['#ef6b5e','#c0392b','#e74c3c','#f39c12','#d35400','#ff6b6b'],
+    count: 14,
+    angleRange: [0, 360],
+    distance: [35, 85],
+    size: [4, 9],
+    duration: 650
+  } : {
+    colors: ['#ffd700','#fff8dc','#f0e68c','#ffe4b5','#ffec8b','#fff'],
+    count: 12,
+    angleRange: [-70, -110],
+    distance: [30, 70],
+    size: [3, 7],
+    duration: 750
+  };
+
+  const container = wrapper.closest('.viz-bar-chart-outer');
+  const frag = document.createDocumentFragment();
+
+  for (let i = 0; i < config.count; i++) {
+    const angle = (config.angleRange[0] + Math.random() * (config.angleRange[1] - config.angleRange[0])) * Math.PI / 180;
+    const dist = config.distance[0] + Math.random() * (config.distance[1] - config.distance[0]);
+    const size = config.size[0] + Math.random() * (config.size[1] - config.size[0]);
+    const color = config.colors[Math.floor(Math.random() * config.colors.length)];
+
+    const particle = document.createElement('div');
+    particle.className = 'viz-particle';
+    particle.style.cssText =
+      'left:' + relX + 'px; top:' + relY + 'px;' +
+      'width:' + size + 'px; height:' + size + 'px;' +
+      'background:' + color + ';' +
+      '--dx:' + (Math.cos(angle) * dist) + 'px;' +
+      '--dy:' + (Math.sin(angle) * dist) + 'px;' +
+      '--dur:' + (config.duration + Math.random() * 200) + 'ms;' +
+      '--delay:' + (Math.random() * 80) + 'ms;';
+    frag.appendChild(particle);
+  }
+
+  container.appendChild(frag);
+  setTimeout(function() {
+    container.querySelectorAll('.viz-particle').forEach(function(p) { p.remove(); });
+  }, config.duration + 300);
+
+  // 柱子特效
+  pillar.classList.add(type === 'annihilate' ? 'eliminating' : 'waking');
+  setTimeout(function() {
+    pillar.style.height = '0px';
+    pillar.classList.remove('eliminating', 'waking');
+  }, config.duration);
+}
+
+// ============================================================
+// 事件绑定
+// ============================================================
+btnPlay.addEventListener('click', function() {
+  if (stepMode) { toggleStepMode(); play(); return; }
+  playing ? pause() : play();
+});
+btnStep.addEventListener('click', stepForward);
+btnReset.addEventListener('click', reset);
+btnStepMode.addEventListener('click', toggleStepMode);
+speedBtns.forEach(function(b) {
+  b.addEventListener('click', function() { setSpeed(parseInt(b.dataset.speed), b); });
+});
+
+// 键盘快捷键
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+  switch (e.key) {
+    case ' ': e.preventDefault(); playing ? pause() : play(); break;
+    case 'ArrowRight': e.preventDefault(); stepForward(); break;
+    case 'r': case 'R': e.preventDefault(); reset(); break;
+    case 'm': case 'M': e.preventDefault(); toggleStepMode(); break;
+    case '1': e.preventDefault(); setSpeed(1200, speedBtns[0]); break;
+    case '2': e.preventDefault(); setSpeed(800, speedBtns[1]); break;
+    case '3': e.preventDefault(); setSpeed(400, speedBtns[2]); break;
+    case '4': e.preventDefault(); setSpeed(150, speedBtns[3]); break;
+  }
+});
+
+// ============================================================
+// 初始化
+// ============================================================
+(function init() {
+  renderCodeLines(userCodeLines, -1);
+  codeAlgoTag.textContent = '{{ submission.recognized_algo or "" }}';
+  loadReplaySteps();
+})();
+</script>
+{% endblock %}

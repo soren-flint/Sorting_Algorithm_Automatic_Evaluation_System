@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% if request.args.get('lang') == 'en' %}
+  {% set L = {'title_reg':'Register', 'title_login':'Sign In', 'h2_reg':'Create Account', 'h2_login':'Welcome Back',
+       'username':'Username', 'pw':'Password', 'role':'Role',
+       'student':'Student', 'teacher':'Teacher',
+       'btn_reg':'Register', 'btn_login':'Sign In',
+       'no_account':"No account? <a href='#'>Register</a>",
+       'has_account':"Already have one? <a href='#'>Sign In</a>",
+       'demo_title':'Demo Accounts', 'switch_lang':'中文'} %}
+{% else %}
+  {% set L = {'title_reg':'注册', 'title_login':'登录', 'h2_reg':'创建账号', 'h2_login':'欢迎回来',
+       'username':'用户名', 'pw':'密码', 'role':'角色',
+       'student':'学生', 'teacher':'教师',
+       'btn_reg':'注册', 'btn_login':'登录',
+       'no_account':"没有账号？<a href='#'>立即注册</a>",
+       'has_account':"已有账号？<a href='#'>去登录</a>",
+       'demo_title':'演示账号', 'switch_lang':'English'} %}
+{% endif %}
+{% block title %}{% if mode == 'register' %}{{ L.title_reg }}{% else %}{{ L.title_login }}{% endif %} — 排序算法学习系统{% endblock %}
+{% block content %}
+<div class="login-wrap">
+  <h2>{% if mode == 'register' %}{{ L.h2_reg }}{% else %}{{ L.h2_login }}{% endif %}</h2>
+  <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form-group"><label>{{ L.username }}</label><input type="text" name="username" placeholder="{{ L.username }}" required autofocus></div>
+    <div class="form-group"><label>{{ L.pw }}</label><input type="password" name="password" placeholder="{{ L.pw }}" required></div>
+    {% if mode == 'register' %}
+    <div class="form-group"><label>{{ L.role }}</label><select name="role"><option value="student">{{ L.student }}</option><option value="teacher">{{ L.teacher }}</option></select></div>
+    {% endif %}
+    <button type="submit" class="primary" style="width:100%;margin-top:8px">{% if mode == 'register' %}{{ L.btn_reg }}{% else %}{{ L.btn_login }}{% endif %}</button>
+  </form>
+  <p style="text-align:center;margin-top:16px;font-size:.82rem;color:var(--muted)">
+    {% if mode == 'login' %}
+      {% if request.args.get('lang') == 'en' %}No account? <a href="{{ url_for('auth.register') }}?lang=en">Register</a>{% else %}没有账号？<a href="{{ url_for('auth.register') }}">立即注册</a>{% endif %}
+    {% else %}
+      {% if request.args.get('lang') == 'en' %}Already have one? <a href="{{ url_for('auth.login') }}?lang=en">Sign In</a>{% else %}已有账号？<a href="{{ url_for('auth.login') }}">去登录</a>{% endif %}
+    {% endif %}
+  </p>
+  <p style="text-align:center;margin-top:8px;font-size:.75rem">
+    {% if request.args.get('lang') == 'en' %}
+      <a href="?">切换到中文</a>
+    {% else %}
+      <a href="?lang=en">Switch to English</a>
+    {% endif %}
+  </p>
+  <details style="margin-top:14px"><summary style="cursor:pointer;font-size:.75rem;color:var(--muted)">{% if request.args.get('lang') == 'en' %}Demo Accounts{% else %}演示账号{% endif %}</summary><div style="font-size:.75rem;margin-top:6px;font-family:var(--font-mono);color:var(--muted)">{% if request.args.get('lang') == 'en' %}Student: student1 / 123456<br>Teacher: teacher1 / 123456{% else %}学生：student1 / 123456<br>教师：teacher1 / 123456{% endif %}</div></details>
+</div>
+{% endblock %}

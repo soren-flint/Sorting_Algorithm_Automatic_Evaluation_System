@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}代码查重 — 排序算法学习系统{% endblock %}
+{% block content %}
+
+<h2 style="margin-bottom:16px">🔍 代码查重</h2>
+
+<div class="card" style="padding:20px;margin-bottom:20px">
+  <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <label style="font-size:.85rem;font-weight:600;color:var(--title)">选择题目：</label>
+      <select name="problem_id" style="max-width:300px">
+        {% for p in problems %}
+        <option value="{{ p.id }}" {% if selected_problem and selected_problem.id == p.id %}selected{% endif %}>
+          #{{ p.id }} {{ p.title }}
+        </option>
+        {% endfor %}
+      </select>
+      <label style="font-size:.85rem;font-weight:600;color:var(--title)">相似度阈值：</label>
+      <input type="number" name="threshold" value="0.85" step="0.05" min="0" max="1" style="width:80px">
+      <button type="submit" class="btn-sm primary">开始检测</button>
+    </div>
+  </form>
+</div>
+
+{% if results is not none %}
+{% if results %}
+<table>
+  <thead>
+    <tr>
+      <th>提交 A</th>
+      <th>提交 B</th>
+      <th>相似度</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in results %}
+    <tr>
+      <td>{{ r.sub_a.user.username }} (#{{ r.sub_a.id }})</td>
+      <td>{{ r.sub_b.user.username }} (#{{ r.sub_b.id }})</td>
+      <td>
+        <span style="font-family:JetBrains Mono,monospace;font-weight:600;
+          color:{% if r.similarity >= 0.9 %}var(--danger){% elif r.similarity >= 0.8 %}var(--warning){% else %}var(--success){% endif %}">
+          {{ "%.1f" | format(r.similarity * 100) }}%
+        </span>
+      </td>
+      <td>
+        <a href="{{ url_for('submit.visualize', submission_id=r.sub_a.id) }}" class="btn-sm ghost">查看 A</a>
+        <a href="{{ url_for('submit.visualize', submission_id=r.sub_b.id) }}" class="btn-sm ghost">查看 B</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="text-center py-4 text-muted">未发现相似的提交对。🎉</div>
+{% endif %}
+{% else %}
+<div class="text-center py-4 text-muted">选择题目并点击「开始检测」查看结果。</div>
+{% endif %}
+{% endblock %}

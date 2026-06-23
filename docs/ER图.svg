@@ -1,0 +1,315 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 880" font-family="'Microsoft YaHei', 'Noto Sans SC', 'Consolas', monospace">
+  <defs>
+    <!-- 外键箭头 -->
+    <marker id="fkArrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#555"/>
+    </marker>
+    <!-- Crow's Foot 标记 -->
+    <!-- 一（竖线） -->
+    <line id="crowOne" x1="-8" y1="-8" x2="-8" y2="8" stroke="#555" stroke-width="1.5"/>
+    <!-- 多（三叉） -->
+    <g id="crowMany">
+      <line x1="0" y1="-7" x2="-8" y2="0" stroke="#555" stroke-width="1.5"/>
+      <line x1="0" y1="0" x2="-8" y2="0" stroke="#555" stroke-width="1.5"/>
+      <line x1="0" y1="7" x2="-8" y2="0" stroke="#555" stroke-width="1.5"/>
+    </g>
+    <filter id="shadow2" x="-4%" y="-4%" width="108%" height="108%">
+      <feDropShadow dx="1.5" dy="1.5" stdDeviation="3" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="1200" height="880" fill="#fafbfc"/>
+
+  <!-- 标题 -->
+  <text x="600" y="32" text-anchor="middle" font-size="20" font-weight="bold" fill="#1a1a2e">SortJudge — 数据库 ER 图</text>
+  <line x1="420" y1="40" x2="780" y2="40" stroke="#1a1a2e" stroke-width="1.5" stroke-dasharray="4,2"/>
+
+  <!-- ============================================================ -->
+  <!-- 实体 1: user (左上) -->
+  <!-- ============================================================ -->
+  <g filter="url(#shadow2)">
+    <rect x="40" y="70" width="210" height="155" rx="6" fill="#fff" stroke="#1565C0" stroke-width="2"/>
+    <!-- 表头 -->
+    <rect x="40" y="70" width="210" height="26" rx="6" fill="#1565C0"/>
+    <rect x="40" y="86" width="210" height="10" fill="#1565C0"/>
+    <text x="145" y="88" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">👤 User（用户）</text>
+    <!-- 分隔线 -->
+    <line x1="40" y1="96" x2="250" y2="96" stroke="#1565C0" stroke-width="1"/>
+    <!-- 属性 -->
+    <text x="52" y="114" font-size="12" fill="#333"><tspan font-weight="bold" fill="#C62828">PK</tspan> id : INTEGER</text>
+    <line x1="48" y1="119" x2="242" y2="119" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="52" y="133" font-size="12" fill="#333"><tspan font-weight="bold" fill="#00695C">UQ</tspan> username : TEXT</text>
+    <line x1="48" y1="138" x2="242" y2="138" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="52" y="152" font-size="12" fill="#333">password_hash : TEXT</text>
+    <line x1="48" y1="157" x2="242" y2="157" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="52" y="171" font-size="12" fill="#333">role : TEXT {"student", "teacher"}</text>
+    <line x1="48" y1="176" x2="242" y2="176" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="52" y="193" font-size="11" fill="#888" font-style="italic">+ set_password(pwd)</text>
+    <text x="52" y="208" font-size="11" fill="#888" font-style="italic">+ check_password(pwd): bool</text>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- 实体 2: problem (中上) -->
+  <!-- ============================================================ -->
+  <g filter="url(#shadow2)">
+    <rect x="390" y="70" width="280" height="200" rx="6" fill="#fff" stroke="#2E7D32" stroke-width="2"/>
+    <rect x="390" y="70" width="280" height="26" rx="6" fill="#2E7D32"/>
+    <rect x="390" y="86" width="280" height="10" fill="#2E7D32"/>
+    <text x="530" y="88" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">📋 Problem（题目）</text>
+    <line x1="390" y1="96" x2="670" y2="96" stroke="#2E7D32" stroke-width="1"/>
+    <text x="402" y="114" font-size="12" fill="#333"><tspan font-weight="bold" fill="#C62828">PK</tspan> id : INTEGER</text>
+    <line x1="398" y1="119" x2="662" y2="119" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="402" y="133" font-size="12" fill="#333">title : TEXT</text>
+    <line x1="398" y1="138" x2="662" y2="138" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="402" y="152" font-size="12" fill="#333">description : TEXT</text>
+    <line x1="398" y1="157" x2="662" y2="157" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="402" y="171" font-size="12" fill="#333">difficulty : TEXT</text>
+    <line x1="398" y1="176" x2="662" y2="176" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="402" y="190" font-size="12" fill="#333">algo_type : TEXT</text>
+    <line x1="398" y1="195" x2="662" y2="195" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="402" y="209" font-size="12" fill="#333">sort_rule : TEXT {"strict","stalin","stable","topk"}</text>
+    <line x1="398" y1="214" x2="662" y2="214" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="402" y="226" font-size="11" fill="#999">complexity_ceiling : TEXT (nullable)</text>
+    <line x1="398" y1="231" x2="662" y2="231" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="402" y="243" font-size="12" fill="#333">example_code : TEXT</text>
+    <line x1="398" y1="248" x2="662" y2="248" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="402" y="261" font-size="12" fill="#333">is_meme : BOOLEAN</text>
+    <line x1="398" y1="266" x2="662" y2="266" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="402" y="283" font-size="12" fill="#333"><tspan font-weight="bold" fill="#E65100">FK</tspan> created_by → user.id</text>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- 实体 3: test_case (右上) -->
+  <!-- ============================================================ -->
+  <g filter="url(#shadow2)">
+    <rect x="820" y="70" width="240" height="150" rx="6" fill="#fff" stroke="#F57C00" stroke-width="2"/>
+    <rect x="820" y="70" width="240" height="26" rx="6" fill="#F57C00"/>
+    <rect x="820" y="86" width="240" height="10" fill="#F57C00"/>
+    <text x="940" y="88" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">🧪 TestCase（测试用例）</text>
+    <line x1="820" y1="96" x2="1060" y2="96" stroke="#F57C00" stroke-width="1"/>
+    <text x="832" y="114" font-size="12" fill="#333"><tspan font-weight="bold" fill="#C62828">PK</tspan> id : INTEGER</text>
+    <line x1="828" y1="119" x2="1052" y2="119" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="832" y="133" font-size="12" fill="#333"><tspan font-weight="bold" fill="#E65100">FK</tspan> problem_id → problem.id</text>
+    <line x1="828" y1="138" x2="1052" y2="138" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="832" y="152" font-size="12" fill="#333">input_data : TEXT (JSON数组)</text>
+    <line x1="828" y1="157" x2="1052" y2="157" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="832" y="171" font-size="12" fill="#333">expected_output : TEXT (nullable, JSON)</text>
+    <line x1="828" y1="176" x2="1052" y2="176" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="832" y="190" font-size="12" fill="#333">is_public : BOOLEAN</text>
+    <line x1="828" y1="195" x2="1052" y2="195" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="832" y="210" font-size="11" fill="#888">(公开/隐藏用例)</text>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- 实体 4: submission (中左) -->
+  <!-- ============================================================ -->
+  <g filter="url(#shadow2)">
+    <rect x="130" y="370" width="250" height="195" rx="6" fill="#fff" stroke="#6A1B9A" stroke-width="2"/>
+    <rect x="130" y="370" width="250" height="26" rx="6" fill="#6A1B9A"/>
+    <rect x="130" y="386" width="250" height="10" fill="#6A1B9A"/>
+    <text x="255" y="388" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">📤 Submission（提交）</text>
+    <line x1="130" y1="396" x2="380" y2="396" stroke="#6A1B9A" stroke-width="1"/>
+    <text x="142" y="414" font-size="12" fill="#333"><tspan font-weight="bold" fill="#C62828">PK</tspan> id : INTEGER</text>
+    <line x1="138" y1="419" x2="372" y2="419" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="142" y="433" font-size="12" fill="#333"><tspan font-weight="bold" fill="#E65100">FK</tspan> user_id → user.id</text>
+    <line x1="138" y1="438" x2="372" y2="438" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="142" y="452" font-size="12" fill="#333"><tspan font-weight="bold" fill="#E65100">FK</tspan> problem_id → problem.id</text>
+    <line x1="138" y1="457" x2="372" y2="457" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="142" y="471" font-size="12" fill="#333">code : TEXT</text>
+    <line x1="138" y1="476" x2="372" y2="476" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="142" y="490" font-size="12" fill="#333">status : TEXT</text>
+    <line x1="138" y1="495" x2="372" y2="495" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="142" y="507" font-size="11" fill="#999">{"pending","pass","fail","error","timeout"}</text>
+    <line x1="138" y1="512" x2="372" y2="512" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="142" y="526" font-size="12" fill="#333">score : INTEGER</text>
+    <line x1="138" y1="531" x2="372" y2="531" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="142" y="545" font-size="12" fill="#333">recognized_algo : TEXT (nullable)</text>
+    <line x1="138" y1="550" x2="372" y2="550" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="142" y="564" font-size="12" fill="#333">submitted_at : DATETIME</text>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- 实体 5: submission_detail (中中) -->
+  <!-- ============================================================ -->
+  <g filter="url(#shadow2)">
+    <rect x="510" y="380" width="260" height="170" rx="6" fill="#fff" stroke="#00838F" stroke-width="2"/>
+    <rect x="510" y="380" width="260" height="26" rx="6" fill="#00838F"/>
+    <rect x="510" y="396" width="260" height="10" fill="#00838F"/>
+    <text x="640" y="398" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">📊 SubmissionDetail（评测详情）</text>
+    <line x1="510" y1="406" x2="770" y2="406" stroke="#00838F" stroke-width="1"/>
+    <text x="522" y="424" font-size="12" fill="#333"><tspan font-weight="bold" fill="#C62828">PK</tspan> id : INTEGER</text>
+    <line x1="518" y1="429" x2="762" y2="429" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="522" y="443" font-size="12" fill="#333"><tspan font-weight="bold" fill="#E65100">FK</tspan> submission_id → submission.id</text>
+    <line x1="518" y1="448" x2="762" y2="448" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="522" y="462" font-size="12" fill="#333"><tspan font-weight="bold" fill="#E65100">FK</tspan> test_case_id → test_case.id</text>
+    <line x1="518" y1="467" x2="762" y2="467" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="522" y="481" font-size="12" fill="#333">input_arr : TEXT (JSON)</text>
+    <line x1="518" y1="486" x2="762" y2="486" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="522" y="500" font-size="12" fill="#333">actual_output : TEXT (nullable)</text>
+    <line x1="518" y1="505" x2="762" y2="505" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="522" y="519" font-size="12" fill="#333">passed : BOOLEAN</text>
+    <line x1="518" y1="524" x2="762" y2="524" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="522" y="538" font-size="12" fill="#333">feedback : TEXT (nullable)</text>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- 实体 6: sort_step (右中) -->
+  <!-- ============================================================ -->
+  <g filter="url(#shadow2)">
+    <rect x="860" y="360" width="240" height="175" rx="6" fill="#fff" stroke="#78909C" stroke-width="2"/>
+    <rect x="860" y="360" width="240" height="26" rx="6" fill="#78909C"/>
+    <rect x="860" y="376" width="240" height="10" fill="#78909C"/>
+    <text x="980" y="378" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">🎬 SortStep（排序步骤）</text>
+    <line x1="860" y1="386" x2="1100" y2="386" stroke="#78909C" stroke-width="1"/>
+    <text x="872" y="404" font-size="12" fill="#333"><tspan font-weight="bold" fill="#C62828">PK</tspan> id : INTEGER</text>
+    <line x1="868" y1="409" x2="1092" y2="409" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="872" y="423" font-size="12" fill="#333"><tspan font-weight="bold" fill="#E65100">FK</tspan> detail_id → detail.id</text>
+    <line x1="868" y1="428" x2="1092" y2="428" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="872" y="442" font-size="12" fill="#333">seq : INTEGER</text>
+    <line x1="868" y1="447" x2="1092" y2="447" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="872" y="461" font-size="12" fill="#333">array_state : TEXT (JSON快照)</text>
+    <line x1="868" y1="466" x2="1092" y2="466" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="872" y="480" font-size="12" fill="#333">op : TEXT</text>
+    <line x1="868" y1="485" x2="1092" y2="485" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="872" y="497" font-size="11" fill="#999">{"compare","swap","set","delete","done","error"}</text>
+    <line x1="868" y1="502" x2="1092" y2="502" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="872" y="515" font-size="11" fill="#999">i : INTEGER (nullable, 操作下标i)</text>
+    <line x1="868" y1="520" x2="1092" y2="520" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="872" y="534" font-size="12" fill="#333">j : INTEGER (nullable, 操作下标j)</text>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- 实体 7: complexity_analysis (下中) -->
+  <!-- ============================================================ -->
+  <g filter="url(#shadow2)">
+    <rect x="410" y="610" width="310" height="170" rx="6" fill="#fff" stroke="#E65100" stroke-width="2"/>
+    <rect x="410" y="610" width="310" height="26" rx="6" fill="#E65100"/>
+    <rect x="410" y="626" width="310" height="10" fill="#E65100"/>
+    <text x="565" y="628" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">📈 ComplexityAnalysis（复杂度分析）</text>
+    <line x1="410" y1="636" x2="720" y2="636" stroke="#E65100" stroke-width="1"/>
+    <text x="422" y="654" font-size="12" fill="#333"><tspan font-weight="bold" fill="#C62828">PK</tspan> id : INTEGER</text>
+    <line x1="418" y1="659" x2="712" y2="659" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="422" y="673" font-size="12" fill="#333"><tspan font-weight="bold" fill="#E65100">FK</tspan><tspan font-weight="bold" fill="#00695C"> UQ</tspan> submission_id → submission.id</text>
+    <line x1="418" y1="678" x2="712" y2="678" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="422" y="692" font-size="12" fill="#333">estimated : TEXT (如 "O(n²)")</text>
+    <line x1="418" y1="697" x2="712" y2="697" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="422" y="711" font-size="12" fill="#333">theoretical : TEXT (nullable, 理论值)</text>
+    <line x1="418" y1="716" x2="712" y2="716" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="422" y="730" font-size="12" fill="#333">timings : TEXT (JSON 各规模耗时)</text>
+    <line x1="418" y1="735" x2="712" y2="735" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="422" y="749" font-size="12" fill="#333">ratio : REAL (nullable, 最大比)</text>
+    <line x1="418" y1="754" x2="712" y2="754" stroke="#e0e0e0" stroke-width="0.5"/>
+    <text x="422" y="768" font-size="12" fill="#333">meets_ceiling : BOOLEAN (nullable)</text>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- 关系线（含 Crow's Foot 标记） -->
+  <!-- ============================================================ -->
+
+  <!-- R1: user 1──0..* submission -->
+  <!-- user 底部 (145, 225) → submission 顶部 (255, 370) -->
+  <line x1="145" y1="225" x2="190" y2="370" stroke="#555" stroke-width="1.5"/>
+  <!-- Crow's Foot at submission 侧: 一 -->
+  <line x1="190" y1="370" x2="190" y2="362" stroke="#555" stroke-width="2"/>
+  <!-- Crow's Foot at user 侧: 多 (三叉) -->
+  <g transform="translate(145, 225) rotate(0)">
+    <line x1="0" y1="-7" x2="-8" y2="0" stroke="#555" stroke-width="1.5"/>
+    <line x1="0" y1="0" x2="-8" y2="0" stroke="#555" stroke-width="1.5"/>
+    <line x1="0" y1="7" x2="-8" y2="0" stroke="#555" stroke-width="1.5"/>
+  </g>
+  <text x="165" y="300" font-size="10" fill="#888" transform="rotate(-90 165 300)">submits</text>
+  <text x="150" y="240" font-size="9" fill="#777">1</text>
+  <text x="195" y="355" font-size="9" fill="#777">0..*</text>
+
+  <!-- R2: problem 1──0..* test_case -->
+  <line x1="670" y1="170" x2="820" y2="170" stroke="#555" stroke-width="1.5"/>
+  <!-- Crow's Foot at problem: 多 -->
+  <g transform="translate(670, 170) rotate(180)">
+    <line x1="0" y1="-7" x2="-8" y2="0" stroke="#555" stroke-width="1.5"/>
+    <line x1="0" y1="0" x2="-8" y2="0" stroke="#555" stroke-width="1.5"/>
+    <line x1="0" y1="7" x2="-8" y2="0" stroke="#555" stroke-width="1.5"/>
+  </g>
+  <!-- Crow's Foot at test_case: 一 -->
+  <line x1="820" y1="170" x2="820" y2="162" stroke="#555" stroke-width="2"/>
+  <text x="740" y="160" font-size="10" fill="#888">has</text>
+  <text x="685" y="165" font-size="9" fill="#777">0..*</text>
+  <text x="825" y="165" font-size="9" fill="#777">1</text>
+
+  <!-- R3: problem 1──0..* submission -->
+  <line x1="470" y1="270" x2="270" y2="370" stroke="#555" stroke-width="1.5"/>
+  <g transform="translate(470, 270) rotate(180)">
+    <line x1="0" y1="-7" x2="-8" y2="0" stroke="#555" stroke-width="1.5"/>
+    <line x1="0" y1="0" x2="-8" y2="0" stroke="#555" stroke-width="1.5"/>
+    <line x1="0" y1="7" x2="-8" y2="0" stroke="#555" stroke-width="1.5"/>
+  </g>
+  <line x1="270" y1="370" x2="270" y2="362" stroke="#555" stroke-width="2"/>
+  <text x="340" y="325" font-size="10" fill="#888">evaluated</text>
+  <text x="485" y="285" font-size="9" fill="#777">0..*</text>
+  <text x="275" y="355" font-size="9" fill="#777">1</text>
+
+  <!-- R4: submission 1──0..* detail -->
+  <line x1="380" y1="480" x2="510" y2="480" stroke="#555" stroke-width="1.5"/>
+  <g transform="translate(380, 480) rotate(180)">
+    <line x1="0" y1="-7" x2="-8" y2="0" stroke="#555" stroke-width="1.5"/>
+    <line x1="0" y1="0" x2="-8" y2="0" stroke="#555" stroke-width="1.5"/>
+    <line x1="0" y1="7" x2="-8" y2="0" stroke="#555" stroke-width="1.5"/>
+  </g>
+  <line x1="510" y1="480" x2="510" y2="472" stroke="#555" stroke-width="2"/>
+  <text x="435" y="470" font-size="10" fill="#888">details</text>
+  <text x="395" y="475" font-size="9" fill="#777">0..*</text>
+  <text x="515" y="475" font-size="9" fill="#777">1</text>
+
+  <!-- R5: detail 1──0..* sort_step -->
+  <!-- detail 右边缘 (770, 480) → sort_step 左边缘 (860, 455) -->
+  <line x1="770" y1="480" x2="860" y2="455" stroke="#555" stroke-width="1.5"/>
+  <g transform="translate(770, 480) rotate(180)">
+    <line x1="0" y1="-7" x2="-8" y2="0" stroke="#555" stroke-width="1.5"/>
+    <line x1="0" y1="0" x2="-8" y2="0" stroke="#555" stroke-width="1.5"/>
+    <line x1="0" y1="7" x2="-8" y2="0" stroke="#555" stroke-width="1.5"/>
+  </g>
+  <line x1="860" y1="455" x2="860" y2="447" stroke="#555" stroke-width="2"/>
+  <text x="810" y="460" font-size="10" fill="#888">steps</text>
+  <text x="785" y="475" font-size="9" fill="#777">0..*</text>
+  <text x="865" y="450" font-size="9" fill="#777">1</text>
+
+  <!-- R6: submission 1──0..1 complexity_analysis -->
+  <!-- submission 底部 (255, 565) → cx 顶部 (520, 610) -->
+  <line x1="255" y1="565" x2="520" y2="610" stroke="#555" stroke-width="1.5"/>
+  <line x1="255" y1="565" x2="255" y2="557" stroke="#555" stroke-width="1.5"/>
+  <!-- Crow's Foot at cx: 一（0..1） -->
+  <line x1="520" y1="610" x2="520" y2="602" stroke="#555" stroke-width="2"/>
+  <text x="310" y="595" font-size="10" fill="#888">analyzed</text>
+  <text x="260" y="555" font-size="9" fill="#777">1</text>
+  <text x="525" y="605" font-size="9" fill="#777">0..1</text>
+
+  <!-- ============================================================ -->
+  <!-- 图例 -->
+  <!-- ============================================================ -->
+  <rect x="40" y="640" width="280" height="200" rx="8" fill="#fff" stroke="#ccc" stroke-width="1.2"/>
+  <text x="180" y="662" text-anchor="middle" font-size="13" font-weight="bold" fill="#333">图例</text>
+
+  <text x="55" y="682" font-size="11" fill="#333"><tspan font-weight="bold" fill="#C62828">PK</tspan> = Primary Key（主键）</text>
+  <text x="55" y="699" font-size="11" fill="#333"><tspan font-weight="bold" fill="#E65100">FK</tspan> = Foreign Key（外键）</text>
+  <text x="55" y="716" font-size="11" fill="#333"><tspan font-weight="bold" fill="#00695C">UQ</tspan> = Unique（唯一约束）</text>
+
+  <line x1="55" y1="732" x2="100" y2="732" stroke="#555" stroke-width="1.5"/>
+  <line x1="55" y1="732" x2="55" y2="724" stroke="#555" stroke-width="2"/>
+  <!-- mini crow many 三叉 -->
+  <g transform="translate(100, 732)">
+    <line x1="0" y1="-4" x2="-5" y2="0" stroke="#555" stroke-width="1.2"/>
+    <line x1="0" y1="0" x2="-5" y2="0" stroke="#555" stroke-width="1.2"/>
+    <line x1="0" y1="4" x2="-5" y2="0" stroke="#555" stroke-width="1.2"/>
+  </g>
+  <text x="125" y="736" font-size="11" fill="#333">1 ← (一) / 0..* ← (多)</text>
+
+  <text x="55" y="756" font-size="11" fill="#555">─────────── 关系汇总 ───────────</text>
+
+  <text x="55" y="775" font-size="11" fill="#333">R1: user 1 ── 0..* submission</text>
+  <text x="55" y="792" font-size="11" fill="#333">R2: problem 1 ── 0..* test_case</text>
+  <text x="55" y="809" font-size="11" fill="#333">R3: problem 1 ── 0..* submission</text>
+  <text x="55" y="826" font-size="11" fill="#333">R4: submission 1 ── 0..* detail</text>
+
+  <!-- 页脚 -->
+  <text x="600" y="868" text-anchor="middle" font-size="10" fill="#aaa">SortJudge v1.0 · 实践周题目二 · SQLite via SQLAlchemy · 2026-06</text>
+</svg>

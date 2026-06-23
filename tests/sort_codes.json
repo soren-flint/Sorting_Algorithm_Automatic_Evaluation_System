@@ -1,0 +1,25 @@
+{
+  "正确代码": {
+    "冒泡_标准": "def sort(arr):\n    n = len(arr)\n    for i in range(n):\n        for j in range(n - 1 - i):\n            if arr[j] > arr[j + 1]:\n                arr[j], arr[j + 1] = arr[j + 1], arr[j]\n    return arr",
+    "快排_递归": "def sort(arr):\n    if len(arr) <= 1:\n        return arr\n    pivot = arr[len(arr)//2]\n    left = [x for x in arr if x < pivot]\n    mid = [x for x in arr if x == pivot]\n    right = [x for x in arr if x > pivot]\n    return sort(left) + mid + sort(right)",
+    "选择排序": "def sort(arr):\n    n = len(arr)\n    for i in range(n):\n        min_idx = i\n        for j in range(i + 1, n):\n            if arr[j] < arr[min_idx]:\n                min_idx = j\n        arr[i], arr[min_idx] = arr[min_idx], arr[i]\n    return arr",
+    "插入排序": "def sort(arr):\n    n = len(arr)\n    for i in range(1, n):\n        key = arr[i]\n        j = i - 1\n        while j >= 0 and arr[j] > key:\n            arr[j + 1] = arr[j]\n            j -= 1\n        arr[j + 1] = key\n    return arr",
+    "归并排序": "def sort(arr):\n    if len(arr) <= 1:\n        return arr\n    mid = len(arr) // 2\n    L = sort(arr[:mid])\n    R = sort(arr[mid:])\n    result, i, j = [], 0, 0\n    while i < len(L) and j < len(R):\n        if L[i] <= R[j]:\n            result.append(L[i]); i += 1\n        else:\n            result.append(R[j]); j += 1\n    return result + L[i:] + R[j:]",
+    "斯大林排序": "def sort(arr):\n    if not arr:\n        return []\n    result = [arr[0]]\n    for x in arr[1:]:\n        if x >= result[-1]:\n            result.append(x)\n    return result"
+  },
+  "错误代码_边界问题": {
+    "off_by_one_少一轮": "def sort(arr):\n    n = len(arr)\n    for i in range(n - 1):\n        for j in range(n - 1 - i):\n            if arr[j] > arr[j + 1]:\n                arr[j], arr[j + 1] = arr[j + 1], arr[j]\n    return arr",
+    "比较方向反了": "def sort(arr):\n    n = len(arr)\n    for i in range(n):\n        for j in range(n - 1 - i):\n            if arr[j] < arr[j + 1]:\n                arr[j], arr[j + 1] = arr[j + 1], arr[j]\n    return arr",
+    "忘记return": "def sort(arr):\n    n = len(arr)\n    for i in range(n):\n        for j in range(n - 1 - i):\n            if arr[j] > arr[j + 1]:\n                arr[j], arr[j + 1] = arr[j + 1], arr[j]",
+    "下标越界": "def sort(arr):\n    n = len(arr)\n    for i in range(n):\n        for j in range(n - i):\n            if arr[j] > arr[j + 1]:\n                arr[j], arr[j + 1] = arr[j + 1], arr[j]\n    return arr"
+  },
+  "离谱错误代码": {
+    "死循环": "def sort(arr):\n    while True:\n        pass",
+    "语法错误": "def sort(arr):\n    n = len(arr)\n    for i in range(n)\n        pass\n    return arr",
+    "调用内置sorted": "def sort(arr):\n    return sorted(arr)",
+    "eval危险": "def sort(arr):\n    eval('print(1)')\n    return sorted(arr)",
+    "删除所有元素": "def sort(arr):\n    return []",
+    "复制多份": "def sort(arr):\n    result = []\n    for x in arr:\n        result.append(x)\n        result.append(x)\n    return sorted(result)",
+    "空函数": "def sort(arr):\n    pass"
+  }
+}

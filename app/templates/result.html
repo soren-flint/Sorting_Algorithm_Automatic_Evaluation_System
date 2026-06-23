@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}评测结果 #{{ submission.id }} — 排序算法学习系统{% endblock %}
+{% block content %}
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+      <div>
+        <h5>{{ submission.problem.title }}</h5>
+        <p class="text-muted small mb-0">
+          {{ submission.submitted_at.strftime('%Y-%m-%d %H:%M') if submission.submitted_at else '' }}
+          {% if submission.recognized_algo %}
+          · <code>{{ submission.recognized_algo }}</code>
+          {% endif %}
+        </p>
+      </div>
+      <div class="text-end">
+        {% set st = submission.status %}
+        <span class="badge bg-{{ 'success' if st=='pass' else 'danger' if st=='fail' else 'warning' }}">
+          {{ {'pass':'✅ 通过','fail':'❌ 失败','error':'⚠️ 错误','timeout':'⏰ 超时','pending':'⏳'}.get(st, st) }}
+        </span>
+        <div class="fw-bold">{{ submission.score }} / 100</div>
+      </div>
+    </div>
+
+    {% if details %}
+    <table class="table table-sm">
+      <thead><tr><th>#</th><th>输入</th><th>期望</th><th>实际</th><th>结果</th></tr></thead>
+      <tbody>
+        {% for d in details %}
+        <tr class="{{ 'table-success' if d.passed else 'table-danger' }}">
+          <td>{{ loop.index }}</td>
+          <td><code class="small">{{ d.input_arr }}</code></td>
+          <td><code class="small">{{ d.test_case.expected_output or '—' }}</code></td>
+          <td><code class="small">{{ d.actual_output or '—' }}</code></td>
+          <td>{{ '✅' if d.passed else '❌' }}
+            {% if d.feedback %}<br><span class="small text-muted">{{ d.feedback[:80] }}</span>{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+
+    <a href="{{ url_for('problem.problem_detail', problem_id=submission.problem_id) }}"
+       class="btn primary" style="margin-right:8px">再做一次</a>
+    <a href="{{ url_for('submit.visualize', submission_id=submission.id) }}"
+       class="btn secondary" style="margin-right:8px">📊 查看排序过程</a>
+    <a href="{{ url_for('submit.submission_history') }}"
+       class="btn-sm ghost">返回历史</a>
+  </div>
+</div>
+
+{% endblock %}

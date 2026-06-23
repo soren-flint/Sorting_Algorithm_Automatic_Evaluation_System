@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}编辑题目 - 排序评测系统{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3>✏️ 编辑题目 #{{ problem.id }}</h3>
+  <a href="{{ url_for('teacher.manage_problems') }}" class="btn btn-outline-secondary">← 返回管理</a>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <form method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <h5>基本信息</h5>
+      <div class="mb-3">
+        <label class="form-label">题目标题 <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" name="title" value="{{ problem.title | e }}" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">题目描述</label>
+        <textarea class="form-control" name="description" rows="6">{{ problem.description | e }}</textarea>
+      </div>
+
+      <h5>评测配置</h5>
+      <div class="row">
+        <div class="col-md-3 mb-3">
+          <label class="form-label">难度</label>
+          <select class="form-select" name="difficulty">
+            {% for v in ['easy','medium','hard'] %}
+            <option value="{{ v }}" {% if problem.difficulty == v %}selected{% endif %}>
+              {{ {'easy':'简单','medium':'中等','hard':'困难'}.get(v, v) }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label">目标算法</label>
+          <select class="form-select" name="algo_type">
+            {% for v in ['bubble','select','insert','quick','merge','heap','any'] %}
+            <option value="{{ v }}" {% if problem.algo_type == v %}selected{% endif %}>
+              {{ v }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label">排序规则</label>
+          <select class="form-select" name="sort_rule">
+            {% for v in ['strict','stalin','stable','topk'] %}
+            <option value="{{ v }}" {% if problem.sort_rule == v %}selected{% endif %}>
+              {{ v }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label">复杂度上限</label>
+          <select class="form-select" name="complexity_ceiling">
+            <option value="" {% if not problem.complexity_ceiling %}selected{% endif %}>不限</option>
+            {% for v in ['O(n log n)','O(n)','O(n²)'] %}
+            <option value="{{ v }}" {% if problem.complexity_ceiling == v %}selected{% endif %}>{{ v }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <hr>
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5>测试用例（保存后替换全部）</h5>
+        <button type="button" class="btn btn-outline-success btn-sm" onclick="addTestCase()">+ 添加用例</button>
+      </div>
+      <div id="testcases-container">
+        {% for tc in problem.test_cases.all() %}
+        <div class="testcase-group card mb-2 p-3 bg-light">
+          <div class="row">
+            <div class="col-md-5 mb-2">
+              <label class="form-label small">输入 (JSON)</label>
+              <input type="text" class="form-control" name="tc_input" value="{{ tc.input_data }}">
+            </div>
+            <div class="col-md-5 mb-2">
+              <label class="form-label small">期望输出 (可选)</label>
+              <input type="text" class="form-control" name="tc_expected" value="{{ tc.expected_output or '' }}">
+            </div>
+            <div class="col-md-2 mb-2 d-flex align-items-end">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="tc_public" value="1"
+                       {% if tc.is_public %}checked{% endif %}>
+                <label class="form-check-label small">公开</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <button type="submit" class="btn btn-primary mt-3">💾 保存修改</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function addTestCase() {
+  const html = `
+    <div class="testcase-group card mb-2 p-3 bg-light">
+      <div class="row">
+        <div class="col-md-5 mb-2">
+          <label class="form-label small">输入 (JSON 数组)</label>
+          <input type="text" class="form-control" name="tc_input" placeholder="[5,4,3,2,1]">
+        </div>
+        <div class="col-md-5 mb-2">
+          <label class="form-label small">期望输出 (可选)</label>
+          <input type="text" class="form-control" name="tc_expected" placeholder="[1,2,3,4,5]">
+        </div>
+        <div class="col-md-2 mb-2 d-flex align-items-end">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="tc_public" value="1" checked>
+            <label class="form-check-label small">公开</label>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('testcases-container').insertAdjacentHTML('beforeend', html);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}题目管理 — 排序算法学习系统{% endblock %}
+{% block content %}
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+  <h2>📋 题目管理</h2>
+  <a href="{{ url_for('teacher.create_problem') }}" class="btn-sm primary">+ 新建题目</a>
+</div>
+
+{% set messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="flash-wrap">
+  {% for cat, msg in messages %}
+  <div class="flash {{ cat }}">{{ msg }}</div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if problems %}
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>标题</th>
+      <th>难度</th>
+      <th>算法</th>
+      <th>规则</th>
+      <th>整活</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in problems %}
+    <tr>
+      <td style="font-family:JetBrains Mono,monospace;font-size:.78rem;color:var(--muted)">#{{ p.id }}</td>
+      <td><strong>{{ p.title }}</strong></td>
+      <td><span class="tag tag-diff">{{ p.difficulty }}</span></td>
+      <td><span class="tag tag-algo">{{ p.algo_type }}</span></td>
+      <td><span class="tag tag-rule">{{ p.sort_rule }}</span></td>
+      <td>{% if p.is_meme %}🤪{% else %}-{% endif %}</td>
+      <td style="display:flex;gap:6px">
+        <a href="{{ url_for('teacher.edit_problem', problem_id=p.id) }}" class="btn-sm ghost">编辑</a>
+        <form method="POST" action="{{ url_for('teacher.delete_problem', problem_id=p.id) }}"
+              onsubmit="return confirm('确定删除「{{ p.title }}」？此操作不可撤销。');">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn-sm ghost" style="color:var(--danger)">删除</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="text-center py-5 text-muted">暂无题目，点击上方按钮创建。</div>
+{% endif %}
+{% endblock %}

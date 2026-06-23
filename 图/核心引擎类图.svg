@@ -1,0 +1,234 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1050" font-family="'Microsoft YaHei', 'PingFang SC', 'Noto Sans SC', sans-serif">
+  <defs>
+    <marker id="dep" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#888"/>
+    </marker>
+  </defs>
+
+  <style>
+    text { font-size: 11px; }
+    .title { font-size: 20px; font-weight: bold; fill: #1a1a2e; }
+    .subtitle { font-size: 12px; fill: #888; }
+    .mod-box { fill: #fff; stroke: #333; stroke-width: 1.5; rx: 8; }
+    .mod-header { rx: 8; }
+    .mod-name { fill: #fff; font-weight: bold; font-size: 12px; }
+    .fn-name { fill: #2c3e50; font-weight: bold; font-size: 10.5px; }
+    .fn-sig { fill: #666; font-size: 9.5px; }
+    .fn-ret { fill: #16a085; font-size: 9.5px; }
+    .dep-line { stroke: #888; stroke-width: 1.2; fill: none; stroke-dasharray: 4 3; }
+    .layer-label { fill: #555; font-size: 14px; font-weight: bold; letter-spacing: 2px; }
+  </style>
+
+  <!-- 背景 -->
+  <rect width="1400" height="1050" fill="#f8f9fa"/>
+
+  <!-- 标题 -->
+  <text x="700" y="28" text-anchor="middle" class="title">SortJudge — 核心引擎类图</text>
+  <text x="700" y="48" text-anchor="middle" class="subtitle">app/core/ · 16 个纯 Python 模块 · 无 Flask 依赖 · 更新 2026-06-23</text>
+
+  <!-- ============================================================ -->
+  <!-- 第 1 层：基础工具 -->
+  <!-- ============================================================ -->
+  <text x="50" y="80" class="layer-label">▸ 基础 / 工具层</text>
+
+  <!-- tracked_list -->
+  <rect x="50" y="95" width="220" height="105" class="mod-box"/>
+  <rect x="50" y="95" width="220" height="24" fill="#8e44ad" class="mod-header"/>
+  <text x="160" y="112" text-anchor="middle" class="mod-name">tracked_list · 步骤拦截列表</text>
+  <text x="60" y="132" class="fn-name">TrackedList(list)</text>
+  <text x="60" y="148" class="fn-sig">构造(可迭代对象, 步骤列表, 上限=500)</text>
+  <text x="60" y="164" class="fn-sig">__setitem__ · pop · append → 拦截写入</text>
+  <text x="60" y="184" class="fn-ret">→ 继承 list，重写可变操作以记录步骤快照</text>
+
+  <!-- validator -->
+  <rect x="310" y="95" width="240" height="120" class="mod-box"/>
+  <rect x="310" y="95" width="240" height="24" fill="#27ae60" class="mod-header"/>
+  <text x="430" y="112" text-anchor="middle" class="mod-name">validator · 排序正确性验证</text>
+  <text x="320" y="135" class="fn-name">验证排序(输出, 输入, 规则) → {通过, 原因}</text>
+  <text x="320" y="151" class="fn-sig">单调检查(数组) → 布尔</text>
+  <text x="320" y="167" class="fn-sig">排列检查(a, b) → 布尔 (Counter 多集相等)</text>
+  <text x="320" y="183" class="fn-sig">子序列检查(短, 长) → 布尔</text>
+  <text x="320" y="199" class="fn-sig">边界错误诊断(输出, 期望) → 字符串|空</text>
+  <text x="320" y="215" class="fn-ret">支持规则: 严格 · 斯大林 · 稳定 · TopK</text>
+
+  <!-- algo_profiles -->
+  <rect x="590" y="95" width="220" height="95" class="mod-box"/>
+  <rect x="590" y="95" width="220" height="24" fill="#27ae60" class="mod-header"/>
+  <text x="700" y="112" text-anchor="middle" class="mod-name">algo_profiles · 算法档案</text>
+  <text x="600" y="135" class="fn-name">获取档案(算法名) → 配置字典|空</text>
+  <text x="600" y="151" class="fn-name">检查上限(估算, 上限) → {满足, 说明}</text>
+  <text x="600" y="173" class="fn-ret">→ 6 种算法理论复杂度 (最优/平均/最差/空间)</text>
+
+  <!-- examples -->
+  <rect x="850" y="95" width="200" height="85" class="mod-box"/>
+  <rect x="850" y="95" width="200" height="24" fill="#27ae60" class="mod-header"/>
+  <text x="950" y="112" text-anchor="middle" class="mod-name">examples · 参考代码库</text>
+  <text x="860" y="135" class="fn-name">示例代码: 字典[字符串,字符串]</text>
+  <text x="860" y="155" class="fn-sig">10 种算法参考实现源码</text>
+  <text x="860" y="175" class="fn-ret">冒泡 · 选择 · 插入 · 快速 · 归并 · 堆</text>
+  <text x="860" y="188" class="fn-ret">斯大林 · 博戈 · 睡眠 · 仁慈斯大林</text>
+
+  <!-- ============================================================ -->
+  <!-- 第 2 层：分析诊断 -->
+  <!-- ============================================================ -->
+  <text x="50" y="235" class="layer-label">▸ 分析 / 诊断层</text>
+
+  <!-- recognizer -->
+  <rect x="50" y="250" width="240" height="105" class="mod-box"/>
+  <rect x="50" y="250" width="240" height="24" fill="#2980b9" class="mod-header"/>
+  <text x="170" y="267" text-anchor="middle" class="mod-name">recognizer · 算法识别器</text>
+  <text x="60" y="290" class="fn-name">识别算法(代码, AST树?) → 字符串</text>
+  <text x="60" y="308" class="fn-sig">AST 特征决策树检测：</text>
+  <text x="60" y="324" class="fn-sig">嵌套循环 · 相邻交换 · 递归 · 归并模式</text>
+  <text x="60" y="340" class="fn-sig">堆模式(2*i+1) · 最小值查找 · 斯大林模式</text>
+  <text x="60" y="356" class="fn-ret">返回如 "bubble(冒泡排序)" / "unknown(未识别)"</text>
+
+  <!-- code_marker -->
+  <rect x="330" y="250" width="250" height="115" class="mod-box"/>
+  <rect x="330" y="250" width="250" height="24" fill="#2980b9" class="mod-header"/>
+  <text x="455" y="267" text-anchor="middle" class="mod-name">code_marker · 代码行号标记</text>
+  <text x="340" y="290" class="fn-name">标记代码(代码, 算法名, AST树?) → 字典|空</text>
+  <text x="340" y="308" class="fn-sig">6 种算法特定 AST 标记策略</text>
+  <text x="340" y="324" class="fn-sig">+ 通用回退(函数节点) 兜底方案</text>
+  <text x="340" y="344" class="fn-ret">→ {算法, 行号: {外层循环, 内层循环, 比较,</text>
+  <text x="345" y="358" class="fn-ret">   交换, 返回}, 代码行: [函数各行...]}</text>
+
+  <!-- algo_semantic_check -->
+  <rect x="620" y="250" width="270" height="125" class="mod-box"/>
+  <rect x="620" y="250" width="270" height="24" fill="#2980b9" class="mod-header"/>
+  <text x="755" y="267" text-anchor="middle" class="mod-name">algo_semantic_check · 语义白盒校验</text>
+  <text x="630" y="290" class="fn-name">语义检查(代码, 算法名, AST树?) → 问题列表</text>
+  <text x="630" y="308" class="fn-sig">冒泡检查 · 选择检查 · 插入检查</text>
+  <text x="630" y="324" class="fn-sig">快速检查 · 归并检查 · 堆检查</text>
+  <text x="630" y="344" class="fn-sig">每项检查：比较方向 · 循环边界 · 递归终止</text>
+  <text x="630" y="360" class="fn-sig">· 指针递增 · 赋值偏移 · 堆子节点公式</text>
+  <text x="630" y="378" class="fn-ret">→ [{严重度: "error"|"warning", 行号, 提示}]</text>
+
+  <!-- feedback -->
+  <rect x="930" y="250" width="260" height="125" class="mod-box"/>
+  <rect x="930" y="250" width="260" height="24" fill="#2980b9" class="mod-header"/>
+  <text x="1060" y="267" text-anchor="middle" class="mod-name">feedback · 智能反馈引擎</text>
+  <text x="940" y="290" class="fn-name">诊断(代码, 运行结果, 算法名) → 字典|空</text>
+  <text x="940" y="308" class="fn-sig">三层诊断机制：</text>
+  <text x="940" y="324" class="fn-sig">① 回溯规则匹配 (8 种异常 + 算法定制提示)</text>
+  <text x="940" y="340" class="fn-sig">② 正则预扫描 (缺冒号/拼写/括号/逗号)</text>
+  <text x="940" y="356" class="fn-sig">③ AST 静态检查 (危险调用/结构/边界)</text>
+  <text x="940" y="372" class="fn-name">静态检查排序(代码, AST树?) → 问题列表</text>
+  <text x="940" y="386" class="fn-ret">辅助: 剥离行内注释 · 括号平衡检查</text>
+
+  <!-- sandbox -->
+  <rect x="1220" y="250" width="170" height="95" class="mod-box"/>
+  <rect x="1220" y="250" width="170" height="24" fill="#2980b9" class="mod-header"/>
+  <text x="1305" y="267" text-anchor="middle" class="mod-name">sandbox · 沙箱执行</text>
+  <text x="1230" y="290" class="fn-name">运行代码(代码, 输入, 超时) → 字典</text>
+  <text x="1230" y="306" class="fn-name">运行并采集(代码, 数组, 超时) → 字典</text>
+  <text x="1230" y="326" class="fn-sig">子进程隔离 · 临时文件 · 5s 超时</text>
+  <text x="1230" y="344" class="fn-ret">→ {标准输出, 错误输出, 返回码, 是否超时}</text>
+
+  <!-- ============================================================ -->
+  <!-- 第 3 层：可视化模拟 -->
+  <!-- ============================================================ -->
+  <text x="50" y="410" class="layer-label">▸ 可视化 / 模拟层</text>
+
+  <!-- algo_simulators -->
+  <rect x="50" y="425" width="260" height="140" class="mod-box"/>
+  <rect x="50" y="425" width="260" height="24" fill="#e67e22" class="mod-header"/>
+  <text x="180" y="442" text-anchor="middle" class="mod-name">algo_simulators · 排序模拟器</text>
+  <text x="60" y="465" class="fn-name">模拟(算法名, 数组) → 步骤列表</text>
+  <text x="60" y="483" class="fn-sig">8 种 Python 生成器：</text>
+  <text x="60" y="499" class="fn-sig">冒泡模拟 · 选择模拟 · 插入模拟</text>
+  <text x="60" y="515" class="fn-sig">快速模拟 · 归并模拟 · 堆模拟</text>
+  <text x="60" y="531" class="fn-sig">斯大林模拟 · 仁慈斯大林模拟</text>
+  <text x="60" y="551" class="fn-ret">每步: {序号, 数组状态, 操作, i, j, 说明, 轮次}</text>
+
+  <!-- step_collector -->
+  <rect x="350" y="425" width="300" height="140" class="mod-box"/>
+  <rect x="350" y="425" width="300" height="24" fill="#e67e22" class="mod-header"/>
+  <text x="500" y="442" text-anchor="middle" class="mod-name">step_collector · 步骤采集器</text>
+  <text x="360" y="465" class="fn-name">采集步骤(代码, 数组, 上限, 策略, AST树?,</text>
+  <text x="363" y="479" class="fn-sig">识别结果?, 标记结果?) → 步骤列表</text>
+  <text x="360" y="499" class="fn-sig">三种策略：</text>
+  <text x="360" y="515" class="fn-sig">策略 C (重放): 识别→标记→模拟→附加行号</text>
+  <text x="360" y="531" class="fn-sig">策略 A (拦截): TrackedList 零侵入回退</text>
+  <text x="360" y="547" class="fn-sig">策略 B (插桩): AST 插桩（预留）</text>
+  <text x="360" y="567" class="fn-ret">→ [{序号, 数组状态, 操作, i, j, 说明, 高亮行号, 轮次}]</text>
+
+  <!-- ============================================================ -->
+  <!-- 第 4 层：评测评分 -->
+  <!-- ============================================================ -->
+  <text x="50" y="600" class="layer-label">▸ 评测 / 评分层</text>
+
+  <!-- comparator -->
+  <rect x="50" y="615" width="270" height="100" class="mod-box"/>
+  <rect x="50" y="615" width="270" height="24" fill="#c0392b" class="mod-header"/>
+  <text x="185" y="632" text-anchor="middle" class="mod-name">comparator · 输出比对器</text>
+  <text x="60" y="655" class="fn-name">比对输出(实际, 期望, 输入数组, 规则) → 字典</text>
+  <text x="60" y="673" class="fn-sig">智能差异描述：长度 · 反转 · 缺失首尾</text>
+  <text x="60" y="689" class="fn-sig">描述差异 · 递增段计数</text>
+  <text x="60" y="709" class="fn-ret">→ {通过, 实际解析, 期望解析, 原因, 差异}</text>
+
+  <!-- complexity -->
+  <rect x="360" y="615" width="240" height="95" class="mod-box"/>
+  <rect x="360" y="615" width="240" height="24" fill="#c0392b" class="mod-header"/>
+  <text x="480" y="632" text-anchor="middle" class="mod-name">complexity · 复杂度估算</text>
+  <text x="370" y="655" class="fn-name">估算(代码, 规模列表?, 超时) → 字典</text>
+  <text x="370" y="673" class="fn-sig">多尺度实测 (n=100,500,1000,2000)</text>
+  <text x="370" y="689" class="fn-sig">计时比率 → O(n) / O(n log n) / O(n²)</text>
+  <text x="370" y="709" class="fn-ret">→ {估算值, 计时数据, 比率, 满足上限}</text>
+
+  <!-- similarity -->
+  <rect x="640" y="615" width="240" height="85" class="mod-box"/>
+  <rect x="640" y="615" width="240" height="24" fill="#c0392b" class="mod-header"/>
+  <text x="760" y="632" text-anchor="middle" class="mod-name">similarity · 代码查重</text>
+  <text x="650" y="655" class="fn-name">相似度(a, b) → 浮点 (0~1)</text>
+  <text x="650" y="671" class="fn-name">检测(提交列表, 阈值=0.85) → 列表</text>
+  <text x="650" y="691" class="fn-sig">AST 令牌化 + 余弦相似度 (防重命名)</text>
+  <text x="650" y="707" class="fn-ret">→ [{提交A, 提交B, 相似度}] 降序排列</text>
+
+  <!-- grader (核心评分引擎) -->
+  <rect x="920" y="600" width="280" height="125" class="mod-box"/>
+  <rect x="920" y="600" width="280" height="24" fill="#c0392b" class="mod-header"/>
+  <text x="1060" y="617" text-anchor="middle" class="mod-name">grader ★ 评分引擎</text>
+  <text x="930" y="640" class="fn-name">评分(代码, 通过数, 总数, 期望算法, 排序规则,</text>
+  <text x="933" y="654" class="fn-sig">复杂度上限?, 估算复杂度?, 静态问题?,</text>
+  <text x="933" y="668" class="fn-sig">识别算法?) → 字典</text>
+  <text x="930" y="688" class="fn-sig">四维 10 分制：</text>
+  <text x="930" y="704" class="fn-sig">正确性(0-4) · 算法匹配(0-2)</text>
+  <text x="930" y="720" class="fn-sig">代码质量(0-2) · 效率(0-2)</text>
+  <text x="930" y="740" class="fn-ret">→ {总分, 满分, 正确性{得分,满分,详情},</text>
+  <text x="933" y="754" class="fn-ret">   算法{...}, 质量{...}, 效率{...}}</text>
+
+  <!-- ============================================================ -->
+  <!-- 依赖关系 -->
+  <!-- ============================================================ -->
+  <text x="50" y="770" class="layer-label">▸ 模块依赖关系（虚线箭头 = import / 运行时调用）</text>
+
+  <!-- grader → examples, feedback, recognizer, algo_profiles -->
+  <path d="M920,600 L920,180" class="dep-line" marker-end="url(#dep)"/>
+  <path d="M920,600 L920,250" class="dep-line" marker-end="url(#dep)"/>
+  <path d="M1060,600 L170,355" class="dep-line" marker-end="url(#dep)"/>
+  <path d="M1060,600 L700,190" class="dep-line" marker-end="url(#dep)"/>
+
+  <!-- comparator → validator -->
+  <path d="M185,615 L430,215" class="dep-line" marker-end="url(#dep)"/>
+
+  <!-- complexity → sandbox -->
+  <path d="M480,615 L1305,345" class="dep-line" marker-end="url(#dep)"/>
+
+  <!-- step_collector → recognizer, code_marker, algo_simulators, tracked_list -->
+  <path d="M350,500 L290,355" class="dep-line" marker-end="url(#dep)"/>
+  <path d="M500,500 L500,365" class="dep-line" marker-end="url(#dep)"/>
+  <path d="M500,500 L180,565" class="dep-line" marker-end="url(#dep)"/>
+  <path d="M350,500 L160,200" class="dep-line" marker-end="url(#dep)"/>
+
+  <!-- sandbox (run_code_with_collect) → tracked_list -->
+  <path d="M1220,345 L270,200" class="dep-line" marker-end="url(#dep)"/>
+
+  <!-- Legend -->
+  <rect x="50" y="810" width="420" height="70" rx="6" fill="#fff" stroke="#ddd" stroke-width="1"/>
+  <text x="65" y="830" font-weight="bold" font-size="12" fill="#333">图例</text>
+  <line x1="65" y1="848" x2="105" y2="848" class="dep-line"/>
+  <text x="112" y="852" font-size="10" fill="#888">虚线箭头 = 模块间依赖关系（import 或运行时调用）</text>
+  <text x="65" y="868" font-size="10" fill="#888">★ 全部 16 个模块无 Flask 依赖，可独立 pytest 测试 → 172+ 用例</text>
+
+</svg>
