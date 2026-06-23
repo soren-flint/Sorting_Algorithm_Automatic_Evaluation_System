@@ -5,7 +5,7 @@
 
 ---
 
-## 🚀 快速启动
+## 快速启动
 
 ```bash
 # 方式一：双击 AAA启动器.bat（自动安装依赖 + 建库 + 启动）
@@ -20,7 +20,7 @@ python run.py        # 启动 http://127.0.0.1:5000
 
 ---
 
-## 🎯 功能概览
+## 功能概览
 
 ### 学生端
 - **6 种排序算法**：冒泡、选择、插入、快速、归并、堆排序
@@ -38,7 +38,7 @@ python run.py        # 启动 http://127.0.0.1:5000
 
 ---
 
-## 🏗️ 架构
+##  架构
 
 ```
 表现层 (Jinja2 + CodeMirror + Canvas)
@@ -66,7 +66,7 @@ python run.py        # 启动 http://127.0.0.1:5000
 
 ---
 
-## 📊 数据库 E-R
+##  数据库 E-R
 
 ```
 user ──1──0..*── submission ──1──0..*── submission_detail ──1──0..*── sort_step
@@ -78,7 +78,7 @@ problem ──1──0..*── test_case           complexity_analysis (0..1)
 
 ---
 
-## 🧪 测试
+##  测试
 
 ```bash
 pytest tests/ -v    # 172+ 个测试用例，覆盖核心引擎 100%
@@ -86,7 +86,7 @@ pytest tests/ -v    # 172+ 个测试用例，覆盖核心引擎 100%
 
 ---
 
-## 📝 开发日志
+##  开发日志
 
 ### 2026-06-18 (v1.0 打磨)
 
@@ -104,30 +104,30 @@ pytest tests/ -v    # 172+ 个测试用例，覆盖核心引擎 100%
 - ✨ `editor.html` 提交按钮加 `class="primary"`
 - ✨ `result.html` 按钮优先级重排：「再做一次」primary，「查看过程」secondary
 
-**动画复刻**：
-- 🎬 `visualize.html` 从 Canvas 渲染完全重写为 DOM bar + CSS 过渡动画
-- 🎬 新增 6 种算法 JavaScript Generator（bubble/select/insert/quick/merge/heap）
-- 🎬 双模式驱动：回放模式（后端 API 数据）+ 演示模式（JS generator 实时生成）
-- 🎬 伪代码面板：根据算法类型动态切换，操作时高亮对应行
-- 🎬 步骤时间线：横向滚动，点击跳转到任意步骤
-- 🎬 统计面板：实时显示比较/交换/赋值/总步数
-- 🎬 完整交互控件：播放/暂停/单步/重置/速度滑块/音效开关/自定义输入/随机数据
+**动画**：
+-  `visualize.html` 从 Canvas 渲染完全重写为 DOM bar + CSS 过渡动画
+-  新增 6 种算法 JavaScript Generator（bubble/select/insert/quick/merge/heap）
+-  双模式驱动：回放模式（后端 API 数据）+ 演示模式（JS generator 实时生成）
+-  伪代码面板：根据算法类型动态切换，操作时高亮对应行
+-  步骤时间线：横向滚动，点击跳转到任意步骤
+-  统计面板：实时显示比较/交换/赋值/总步数
+-  完整交互控件：播放/暂停/单步/重置/速度滑块/音效开关/自定义输入/随机数据
 
 ### 2026-06-23 (v1.1 修复与文档)
 
 **Bug 修复**：
-- 🐛 `feedback.py` 正则预扫描修复：剥离行内注释 `_strip_inline_comment()` 后再匹配，消除 `if x>0:  # 注释` 等行末带注释语句的"缺少冒号"误报；修正 `(?<!:)$` 替代无效的 `$(?!.*:)` 负向先行断言
-- 🐛 `editor.html` 动画区域始终可见：`loadInlineViz` 不再遇空步骤静默退出，改为显示 `📭 暂无排序过程数据` 空状态提示；`.catch()` 分支同样显示错误状态
-- 🐛 **`submit.py` 第59行损坏修复**：多行代码被合并成一行（字面 `\n` 替代换行），导致 `marker_result` 永远未定义，步骤采集全量失败（NameError）。拆分恢复为正确的 11 行代码，步骤采集恢复正常
-- 🐛 `visualize.html` 代码高亮修复：`userCodeLines` 改用 `submission.code.split('\n')` 完整原始代码（替代裁剪后的函数片段），消除绝对行号与渲染行号的偏移；Demo 模式 `highlight_line` 改为 1-based 统一
+-  `feedback.py` 正则预扫描修复：剥离行内注释 `_strip_inline_comment()` 后再匹配，消除 `if x>0:  # 注释` 等行末带注释语句的"缺少冒号"误报；修正 `(?<!:)$` 替代无效的 `$(?!.*:)` 负向先行断言
+-  `editor.html` 动画区域始终可见：`loadInlineViz` 不再遇空步骤静默退出，改为显示 `📭 暂无排序过程数据` 空状态提示；`.catch()` 分支同样显示错误状态
+-  **`submit.py` 第59行损坏修复**：多行代码被合并成一行（字面 `\n` 替代换行），导致 `marker_result` 永远未定义，步骤采集全量失败（NameError）。拆分恢复为正确的 11 行代码，步骤采集恢复正常
+-  `visualize.html` 代码高亮修复：`userCodeLines` 改用 `submission.code.split('\n')` 完整原始代码（替代裁剪后的函数片段），消除绝对行号与渲染行号的偏移；Demo 模式 `highlight_line` 改为 1-based 统一
 
 **功能优化**：
-- ✨ `editor.html` 评分明细展开/折叠：四个维度（正确性/算法匹配/代码质量/效率）均可点击展开，显示详细评分说明 + 专属数据（测试通过数/检测算法/问题清单/复杂度）。问题清单按 severity 着色（红/橙/蓝），附行号
-- ✨ `style.css` 新增 `.grade-detail-expand` 等 16 条展开面板样式规则（折叠旋转动画 + 问题列表着色）
+-  `editor.html` 评分明细展开/折叠：四个维度（正确性/算法匹配/代码质量/效率）均可点击展开，显示详细评分说明 + 专属数据（测试通过数/检测算法/问题清单/复杂度）。问题清单按 severity 着色（红/橙/蓝），附行号
+-  `style.css` 新增 `.grade-detail-expand` 等 16 条展开面板样式规则（折叠旋转动画 + 问题列表着色）
 
 **文档与架构**：
-- 📊 输出架构图到 `../图/`：`ER图.svg`（7 表 + 关系/级联标注）、`核心引擎类图.svg`（16 模块 4 层 + 依赖箭头）、`路由蓝图架构.svg`（4 蓝图 18 路由）、`架构文档.md`（完整技术文档）
-- 📝 核心引擎清单扩至 **16 模块**（补 `algo_simulators` / `code_marker` / `algo_semantic_check` / `tracked_list` / `similarity`）
+-  输出架构图到 `../图/`：`ER图.svg`（7 表 + 关系/级联标注）、`核心引擎类图.svg`（16 模块 4 层 + 依赖箭头）、`路由蓝图架构.svg`（4 蓝图 18 路由）、`架构文档.md`（完整技术文档）
+-  核心引擎清单扩至 **16 模块**（补 `algo_simulators` / `code_marker` / `algo_semantic_check` / `tracked_list` / `similarity`）
 
 ### 2026-06-17 (初始版本)
 - 核心引擎 16 模块完成
@@ -138,7 +138,7 @@ pytest tests/ -v    # 172+ 个测试用例，覆盖核心引擎 100%
 
 ---
 
-## 📂 文档
+##  文档
 
 | 文件 | 内容 |
 |------|------|
@@ -153,7 +153,7 @@ pytest tests/ -v    # 172+ 个测试用例，覆盖核心引擎 100%
 
 ---
 
-## 📦 依赖
+## 依赖
 
 ```
 Flask >= 3.0
@@ -164,7 +164,7 @@ pytest >= 8.0
 
 ---
 
-## ⚠️ 注意事项
+##  注意事项
 
 - 当前使用 Flask 内置 Werkzeug 开发服务器，仅适合单机演示
 - 生产环境建议：Gunicorn + Nginx + PostgreSQL
